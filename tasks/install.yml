@@ -1,0 +1,84 @@
+---
+- name: Check prometheus version
+  command: "{{ prometheus_bin_path }}/prometheus --version"
+  args:
+    chdir: "{{ prometheus_bin_path }}"
+  register: prometheus_check
+  ignore_errors: yes
+  changed_when: false
+  when: is_prometheus
+
+- name: Download prometheus package
+  get_url:
+    url: "{{ prometheus_url }}"
+    dest: "{{ prometheus_releases_path }}"
+  when: is_prometheus and (prometheus_check|failed or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy)
+
+- name: Unarchive prometheus package
+  unarchive:
+    copy: no
+    src: "{{ prometheus_releases_path }}/{{ prometheus_package }}"
+    dest: /tmp
+  when: is_prometheus and (prometheus_check|failed or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy)
+
+- name: Copy prometheus binary
+  copy:
+    src: "/tmp/{{ prometheus_release_name }}/{{ item }}"
+    dest: "{{ prometheus_bin_path }}/{{ item }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    remote_src: yes
+    mode: 0755
+  with_items:
+    - prometheus
+    - promtool
+  notify: restart prometheus
+  when: is_prometheus and (prometheus_check|failed or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy)
+
+- name: Link prometheus binary
+  file:
+    src: "{{ prometheus_bin_path }}/{{ item }}"
+    dest: "/usr/bin/{{ item }}"
+    state: link
+  with_items:
+    - prometheus
+    - promtool
+  when: is_prometheus
+
+- name: Check alertmanager version
+  command: alertmanager -version
+  register: alertmanager_check
+  changed_when: false
+  ignore_errors: true
+  when: is_alertmanager
+
+- name: Download alertmanager package
+  get_url:
+    url: "{{ alertmanager_url }}"
+    dest: "{{ alertmanager_releases_path }}"
+  when: is_alertmanager and (alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy)
+
+- name: Extract alertmanager package
+  unarchive:
+    copy: no
+    src: "{{ alertmanager_releases_path }}/{{ alertmanager_package }}"
+    dest: /tmp
+  when: is_alertmanager and (alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy)
+
+- name: Copy alertmanager binary
+  copy:
+    src: "/tmp/{{ alertmanager_release_name }}/alertmanager"
+    dest: "{{ alertmanager_bin_path }}/alertmanager"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_group }}"
+    remote_src: True
+    mode: 0755
+  when: is_alertmanager and (alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy)
+  notify: restart alertmanager
+
+- name: Link alertmanager binary
+  file:
+    src: "{{ alertmanager_bin_path }}/alertmanager"
+    dest: "/usr/bin/alertmanager"
+    state: link
+  when: is_alertmanager

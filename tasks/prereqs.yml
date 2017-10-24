@@ -1,0 +1,78 @@
+---
+
+- name: Setup apt
+  include: apt.yml
+
+- name: Install dependent packages
+  apt:
+    pkg: "{{ item }}"
+    state: present
+  with_items: "{{ required_packages }}"
+
+- name: Create prometheus group
+  group:
+    name: "{{ prometheus_group }}"
+    system: yes
+    state: present
+  when: is_prometheus
+
+- name: Create prometheus user
+  user:
+    name: "{{ prometheus_user }}"
+    state: present
+    comment: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    shell: /sbin/nologin
+    createhome: no
+    system: yes
+  when: is_prometheus
+
+- name: Check filesystem paths
+  file:
+    dest: "{{ item }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    state: directory
+  with_items:
+    - "{{ prometheus_root_path }}"
+    - "{{ prometheus_releases_path }}"
+    - "{{ prometheus_bin_path }}"
+    - "{{ prometheus_conf_path }}"
+    - "{{ prometheus_rules_path }}"
+    - "{{ prometheus_snippets_path }}"
+    - "{{ prometheus_data_path }}"
+    - "{{ prometheus_log_path }}"
+  when: is_prometheus
+
+- name: Ensure alertmanager group
+  group:
+    name: "{{ alertmanager_group }}"
+    system: yes
+    state: present
+  when: is_alertmanager
+
+- name: Ensure alertmanager user
+  user:
+    name: "{{ alertmanager_user }}"
+    state: present
+    group: "{{ alertmanager_group }}"
+    shell: /sbin/nologin
+    createhome: no
+    system: yes
+  when: is_alertmanager
+
+- name: Ensure skeleton paths
+  file:
+    dest: "{{ item }}"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_user }}"
+    state: directory
+  with_items:
+    - "{{ alertmanager_root_path }}"
+    - "{{ alertmanager_releases_path }}"
+    - "{{ alertmanager_bin_path }}"
+    - "{{ alertmanager_conf_path }}"
+    - "{{ alertmanager_snippets_path }}"
+    - "{{ alertmanager_templates_path }}"
+    - "{{ alertmanager_log_path }}"
+  when: is_alertmanager

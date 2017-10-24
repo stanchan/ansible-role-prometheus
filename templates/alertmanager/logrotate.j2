@@ -1,0 +1,14 @@
+{{ alertmanager_log_path }}/{{ alertmanager_log_file }} {
+  daily
+  sharedscripts
+  notifempty
+  missingok
+  rotate 7
+  size 500M
+  compress
+  delaycompress
+  create 664 {{ alertmanager_user }} {{ alertmanager_group }}
+  postrotate
+        {% if ansible_service_mgr == "init" %}[ ! -f /var/run/alertmanager.pid ] || service alertmanager restart{% else %}[ ! -f /run/alertmanager.pid ] || systemctl restart alertmanager.service{% endif %}
+  endscript
+}

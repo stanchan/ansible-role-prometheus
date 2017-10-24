@@ -1,0 +1,28 @@
+---
+- name: Set is_prometheus if in prometheus group
+  set_fact:
+    is_prometheus: "{{ inventory_hostname in groups['prometheus'] }}"
+
+- name: Set is_alertmanager if in alertmanager group
+  set_fact:
+    is_alertmanager: "{{ inventory_hostname in groups['alertmanager'] }}"
+
+- name: Setup prereqs
+  include: prereqs.yml
+  tags:
+    - install
+
+- name: Install apps
+  include: install.yml
+  tags:
+    - install
+
+- name: Setup configs
+  include: config.yml
+  tags:
+    - config
+
+- name: Setup services
+  include: service.yml
+  tags:
+    - config

@@ -1,0 +1,22 @@
+---
+- name: Install apt-transport-https
+  apt:
+    name: apt-transport-https
+  when: ansible_distribution == 'Debian'
+
+- name: Run apt update
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_distribution == 'Debian'
+  register: apt_result
+  until: apt_result|success
+  retries: 3
+  delay: 1
+  ignore_errors: yes
+
+- name: Retry if needed using command apt-get update
+  command: apt-get update
+  when:
+    - ansible_distribution == 'Debian'
+    - apt_result|failed

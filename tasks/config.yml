@@ -1,0 +1,202 @@
+---
+- name: Copy prometheus rules
+  template:
+    src: "{{ item }}"
+    dest: "{{ prometheus_rules_path }}/{{ item | basename}}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: 0640
+  with_fileglob:
+    - "{{ prometheus_config_rules_templates_path }}/*"
+  when: is_prometheus
+  notify:
+    - reload prometheus
+
+- name: Set prometheus rules loaded var
+  find:
+    paths: "{{ prometheus_config_rules_templates_path }}"
+    file_type: file
+  delegate_to: localhost
+  become: no
+  register: rules_loaded
+  when: is_prometheus
+
+- name: Set prometheus rules templates var
+  set_fact:
+    prometheus_rules_templates:  "{{ rules_loaded.files | map(attribute='path') | map('basename') | list }}"
+  when: is_prometheus
+
+- name: Checking prometheus rules in path
+  find:
+    paths: "{{ prometheus_rules_path }}"
+    file_type: file
+  register: check_rules
+  when: is_prometheus
+
+- name: Remove old prometheus rules
+  file:
+    path: "{{ prometheus_rules_path }}/{{ item }}"
+    state: absent
+  with_items:
+    - "{{ check_rules.files | map(attribute='path') | map('basename') | list | difference(prometheus_rules_templates) }}"
+  when: is_prometheus
+
+- name: Copy prometheus common server config
+  template:
+    src: "prometheus/{{ item }}.j2"
+    dest: "{{ prometheus_snippets_path }}/{{ item }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: 0640
+  with_items:
+    - "1_global_prometheus"
+  when: is_prometheus
+
+- name: Load prometheus scrape vars
+  include_vars:
+    file: "{{ item }}"
+    name: "{{ item | basename | splitext | first }}"
+  with_fileglob:
+    - "{{ prometheus_config_vars_templates_path }}/*"
+  when: is_prometheus
+
+- name: Copy prometheus scrapes
+  template:
+    src: "{{ item }}"
+    dest: "{{ prometheus_snippets_path }}/{{ item | basename | splitext | first }}"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: 0640
+  with_fileglob:
+    - "{{ prometheus_config_scrapes_templates_path }}/*"
+  when: is_prometheus
+
+- name: Set prometheus scrapes loaded var
+  find:
+    paths: "{{ prometheus_config_scrapes_templates_path }}"
+    file_type: file
+  delegate_to: localhost
+  become: no
+  register: scrapes_loaded
+  when: is_prometheus
+
+- name: Set prometheus scrapes templates var
+  set_fact:
+    prometheus_scrapes_templates:  "{{ scrapes_loaded.files | map(attribute='path') | map('basename') | map('splitext') | map('first') | list | union(['1_global_prometheus']) }}"
+  when: is_prometheus
+
+- name: Checking prometheus scrapes in path
+  find:
+    paths: "{{ prometheus_snippets_path }}"
+    file_type: file
+  register: check_scrapes
+  when: is_prometheus
+
+- name: Remove old prometheus scrapes
+  file:
+    path: "{{ prometheus_snippets_path }}/{{ item }}"
+    state: absent
+  with_items:
+    - "{{ check_scrapes.files | map(attribute='path') |  map('basename') | map('splitext') | map('first') | list | difference(prometheus_scrapes_templates) }}"
+  when: is_prometheus
+
+- name: Join prometheus config snippets
+  assemble:
+    remote_src: true
+    src: "{{ prometheus_snippets_path }}"
+    dest: "{{ prometheus_conf_path }}/prometheus.yml"
+    owner: "{{ prometheus_user }}"
+    group: "{{ prometheus_group }}"
+    mode: 0640
+    delimiter: '\n'
+  notify:
+    - restart prometheus
+  when: is_prometheus
+
+- name: Copy prometheus logrotate config
+  template:
+    src: prometheus/logrotate.j2
+    dest: /etc/logrotate.d/prometheus
+    mode: 0644
+    owner: root
+    group: root
+  when: is_prometheus
+
+- name: Copy alertmanager server common config
+  template:
+    src: "alertmanager/{{ item }}.j2"
+    dest: "{{ alertmanager_snippets_path }}/{{ item }}"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_group }}"
+    mode: 0640
+  with_items:
+    - "1_global_alertmanager"
+  when: is_alertmanager
+
+- name: Copy alertmanager server config snippets
+  copy:
+    src: "{{ item }}"
+    dest: "{{ alertmanager_snippets_path }}/{{ item | basename }}"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_group }}"
+    mode: 0640
+  with_fileglob:
+    - "{{ alertmanager_config_snippets_path }}/*"
+  when: is_alertmanager
+
+- name: Checking alertmanager snippets
+  find:
+    paths: "{{ alertmanager_snippets_path }}"
+    file_type: file
+  register: check_snippets
+  when: is_alertmanager
+
+- name: Copy alertmanager default snippets
+  copy:
+    src: "alertmanager/{{ item }}"
+    dest: "{{ alertmanager_snippets_path }}/{{ item }}"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_group }}"
+    mode: 0640
+  with_items:
+    - 2_alertmanager_routes
+    - 3_alertmanager_inhibit_rules
+    - 4_alertmanager_receivers
+  when:
+    - is_alertmanager
+    - check_snippets.files|length < 2
+
+- name: Join alertmanager config snippets
+  assemble:
+    remote_src: true
+    src: "{{ alertmanager_snippets_path }}"
+    dest: "{{ alertmanager_conf_path }}/alertmanager.yml"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_group }}"
+    mode: 0640
+    delimiter: '\n'
+  when: is_alertmanager
+  notify:
+    - restart alertmanager
+
+- name: Copy alertmanager templates
+  copy:
+    src: "{{ item }}"
+    dest: "{{ alertmanager_templates_path }}/{{ item }}"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_group }}"
+    mode: 0640
+  with_fileglob:
+    - "{{ alertmanager_config_templates_path }}/*"
+  when: is_alertmanager
+  notify:
+    - reload alertmanager
+
+- name: Copy alertmanager logrotate config
+  template:
+    src: alertmanager/logrotate.j2
+    dest: /etc/logrotate.d/alertmanager
+    mode: 0644
+    owner: root
+    group: root
+  when: is_alertmanager

@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Stan Chan
+  description: Prometheus Server
+  license: license (Apache)
+  min_ansible_version: 2.2
+  # min_ansible_container_version:
+  github_branch:
+  platforms:
+  - name: Debian
+    versions:
+    - 8
+  - name: Ubuntu
+    versions:
+    - xenial
+  galaxy_tags:
+    - prometheus
+dependencies:

@@ -1,0 +1,118 @@
+---
+required_packages: []
+
+prometheus_version: 1.7.2
+prometheus_release_system: linux-amd64
+prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
+prometheus_package: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}.tar.gz"
+prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/{{ prometheus_package }}"
+prometheus_force_deploy: false
+
+prometheus_external_hostname: "{{ ansible_nodename }}"
+prometheus_port: 9090
+
+prometheus_user: prometheus
+prometheus_group: prometheus
+
+prometheus_root_path: /opt/prometheus
+prometheus_conf_path: "/etc/prometheus"
+prometheus_bin_path: "{{ prometheus_root_path }}/bin"
+prometheus_releases_path: "{{ prometheus_root_path }}/releases"
+prometheus_rules_path: "{{ prometheus_conf_path }}/rules"
+prometheus_snippets_path: "{{ prometheus_conf_path }}/snippets"
+prometheus_data_path: "{{ prometheus_root_path }}/data"
+prometheus_log_path: "/var/log/prometheus"
+prometheus_log_file: "prometheus.log"
+
+prometheus_config_scrapes_files_path: "{{ playbook_dir }}/files/prometheus/config/scrapes"
+prometheus_config_scrapes_templates_path: "{{ playbook_dir }}/templates/prometheus/config/scrapes"
+prometheus_config_vars_templates_path: "{{ playbook_dir }}/templates/prometheus/config/vars"
+prometheus_config_rules_files_path: "{{ playbook_dir }}/files/prometheus/rules"
+prometheus_config_rules_templates_path: "{{ playbook_dir }}/templates/prometheus/rules"
+
+prometheus_storage_local_memory_chunks: 262144
+prometheus_storage_max_chunks_to_persist: 131072
+prometheus_storage_retention: 180h0m0s
+prometheus_storage_retention_local_series_file_shrink_ratio: 0.03
+
+prometheus_scrape_interval: 1m
+prometheus_scrape_timeout: 10s
+prometheus_evaluation_interval: 1m
+prometheus_external_labels: []
+
+prometheus_alertmanager_host: localhost
+prometheus_alertmanager_port: 9093
+
+prometheus_remote_shutdown_enabled: 'false'
+
+prometheus_options:
+  - "alertmanager.url=http://{{ prometheus_alertmanager_host }}:{{ prometheus_alertmanager_port }}"
+  - "storage.local.memory-chunks={{ prometheus_storage_local_memory_chunks }}"
+  - "storage.local.max-chunks-to-persist={{ prometheus_storage_max_chunks_to_persist }}"
+  - "storage.local.retention={{ prometheus_storage_retention }}"
+  - "storage.local.series-file-shrink-ratio={{ prometheus_storage_retention_local_series_file_shrink_ratio }}"
+  - "storage.local.path={{ prometheus_data_path }}"
+  - "web.external-url=http://{{ prometheus_external_hostname }}:{{ prometheus_port }}/"
+  - "web.enable-remote-shutdown={{ prometheus_remote_shutdown_enabled }}"
+  - "config.file={{ prometheus_conf_path }}/prometheus.yml"
+
+default_app:
+  server: 'default'
+  services:
+    - 9100
+    - 9110
+  inventory:
+    pro:
+      es: 0
+      it: 0
+      pt: 0
+    pre:
+      es: 0
+      it: 0
+      pt: 0
+
+alertmanager_version: 0.9.1
+alertmanager_release_system: linux-amd64
+alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
+alertmanager_package: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}.tar.gz"
+alertmanager_url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/{{ alertmanager_package }}"
+alertmanager_force_deploy: false
+
+alertmanager_external_hostname: "{{ ansible_nodename }}"
+alertmanager_port: 9093
+
+alertmanager_user: "{{ prometheus_user }}"
+alertmanager_group: "{{ prometheus_group }}"
+
+alertmanager_root_path: /opt/alertmanager
+alertmanager_bin_path: "{{ alertmanager_root_path }}/bin"
+alertmanager_releases_path: "{{ alertmanager_root_path }}/releases"
+alertmanager_conf_path: "/etc/alertmanager"
+alertmanager_templates_path: "{{ alertmanager_conf_path }}/conf.d"
+alertmanager_snippets_path: "{{ alertmanager_conf_path }}/snippets"
+alertmanager_data_path: "{{ alertmanager_root_path }}/data"
+alertmanager_log_path: "/var/log/alertmanager"
+alertmanager_log_file: "alertmanager.log"
+
+alertmanager_config_snippets_path: "{{ playbook_dir }}/files/alertmanager/config"
+alertmanager_config_templates_path: "{{ playbook_dir }}/files/alertmanager/templates"
+
+alertmanager_service_options:
+  - "config.file={{ alertmanager_conf_path }}/alertmanager.yml"
+  - "storage.path={{ alertmanager_data_path }}"
+  - "web.listen-address=:{{ alertmanager_port }}"
+  - "web.external-url=http://{{ alertmanager_external_hostname }}:{{ alertmanager_port }}/"
+
+alertmanager_resolve_timeout: 5m
+
+alertmanager_smtp_from: ""
+alertmanager_smtp_smarthost: ""
+alertmanager_smtp_auth_username: ""
+alertmanager_smtp_auth_password: ""
+alertmanager_smtp_auth_secret: ""
+alertmanager_smtp_require_tls: "true"
+alertmanager_slack_api_url: ""
+alertmanager_pagerduty_url: ""
+alertmanager_opsgenie_api_host: ""
+alertmanager_hipchat_url: ""
+alertmanager_hipchat_auth_token: ""
