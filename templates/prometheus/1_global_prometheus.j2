@@ -28,12 +28,12 @@ scrape_configs:
   - job_name: 'prometheus_statistics'
     static_configs:
       - targets:
-        - {{ ansible_nodename }}:9090
+        - '{{ ansible_nodename }}:9090'
 
 {% if grafana_host is defined %}
   - job_name: 'grafana'
     static_configs:
       - targets:
-        - {{ grafana_host }}:9100
+        - '{{ grafana_host }}:9100'
 
 {% endif %}
