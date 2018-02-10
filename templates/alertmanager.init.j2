@@ -17,15 +17,15 @@
 ## This is the last section you should need to change anything in.
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
-DESC="Alert System"
+DESC="Alert Manager"
 NAME=alertmanager
 USER={{ alertmanager_user }}
 GROUP={{ alertmanager_group }}
 ROOT={{ alertmanager_root_path }}
-LOG_PATH={{ alertmanager_log_path }}
-LOG_FILE={{ alertmanager_log_file }}
+LOG_PATH={{ alertmanager_log_file | dirname }}
+LOG_FILE={{ alertmanager_log_file | basename }}
 DAEMON={{ alertmanager_bin_path }}/$NAME
-DAEMON_ARGS=""                  # you can pass any flags to your program here
+DAEMON_ARGS="{% for option in alertmanager_service_options %}-{{ option }} {% endfor %}"                  # you can pass any flags to your program here
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 

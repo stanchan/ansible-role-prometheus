@@ -1,0 +1,7 @@
+---
+- name: download gosu
+  get_url:
+    url: "{{ gosu_url }}"
+    dest: /usr/local/bin/gosu
+    mode: 0755
+    validate_certs: "{{ gosu_ssl_verify }}"

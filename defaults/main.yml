@@ -1,14 +1,21 @@
 ---
 required_packages: []
+systemd_service_dir: /lib/systemd/system
 
-prometheus_version: 1.7.2
+gosu_version: "1.10"
+gosu_release_system: amd64
+gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
+gosu_ssl_verify: yes
+
+prometheus_version: 2.1.0
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}.tar.gz"
 prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/{{ prometheus_package }}"
-prometheus_force_deploy: false
+prometheus_force_deploy: no
+prometheus_ssl_verify: yes
 
-prometheus_external_hostname: "{{ ansible_nodename }}"
+prometheus_external_hostname: "{{ ansible_hostname }}"
 prometheus_port: 9090
 
 prometheus_user: prometheus
@@ -21,8 +28,7 @@ prometheus_releases_path: "{{ prometheus_root_path }}/releases"
 prometheus_rules_path: "{{ prometheus_conf_path }}/rules"
 prometheus_snippets_path: "{{ prometheus_conf_path }}/snippets"
 prometheus_data_path: "{{ prometheus_root_path }}/data"
-prometheus_log_path: "/var/log/prometheus"
-prometheus_log_file: "prometheus.log"
+prometheus_log_file: "/var/log/prometheus/prometheus.log"
 
 prometheus_config_scrapes_files_path: "{{ playbook_dir }}/files/prometheus/config/scrapes"
 prometheus_config_scrapes_templates_path: "{{ playbook_dir }}/templates/prometheus/config/scrapes"
@@ -32,7 +38,7 @@ prometheus_config_rules_templates_path: "{{ playbook_dir }}/templates/prometheus
 
 prometheus_storage_local_memory_chunks: 262144
 prometheus_storage_max_chunks_to_persist: 131072
-prometheus_storage_retention: 180h0m0s
+prometheus_storage_retention: 365d
 prometheus_storage_retention_local_series_file_shrink_ratio: 0.03
 
 prometheus_scrape_interval: 1m
@@ -46,14 +52,9 @@ prometheus_alertmanager_port: 9093
 prometheus_remote_shutdown_enabled: 'false'
 
 prometheus_options:
-  - "alertmanager.url=http://{{ prometheus_alertmanager_host }}:{{ prometheus_alertmanager_port }}"
-  - "storage.local.memory-chunks={{ prometheus_storage_local_memory_chunks }}"
-  - "storage.local.max-chunks-to-persist={{ prometheus_storage_max_chunks_to_persist }}"
-  - "storage.local.retention={{ prometheus_storage_retention }}"
-  - "storage.local.series-file-shrink-ratio={{ prometheus_storage_retention_local_series_file_shrink_ratio }}"
-  - "storage.local.path={{ prometheus_data_path }}"
+  - "storage.tsdb.retention={{ prometheus_storage_retention }}"
+  - "storage.tsdb.path={{ prometheus_data_path }}"
   - "web.external-url=http://{{ prometheus_external_hostname }}:{{ prometheus_port }}/"
-  - "web.enable-remote-shutdown={{ prometheus_remote_shutdown_enabled }}"
   - "config.file={{ prometheus_conf_path }}/prometheus.yml"
 
 default_app:
@@ -71,12 +72,13 @@ default_app:
       it: 0
       pt: 0
 
-alertmanager_version: 0.9.1
+alertmanager_version: 0.13.0
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
 alertmanager_package: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}.tar.gz"
 alertmanager_url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/{{ alertmanager_package }}"
-alertmanager_force_deploy: false
+alertmanager_force_deploy: no
+alertmanager_ssl_verify: yes
 
 alertmanager_external_hostname: "{{ ansible_nodename }}"
 alertmanager_port: 9093
@@ -91,8 +93,7 @@ alertmanager_conf_path: "/etc/alertmanager"
 alertmanager_templates_path: "{{ alertmanager_conf_path }}/conf.d"
 alertmanager_snippets_path: "{{ alertmanager_conf_path }}/snippets"
 alertmanager_data_path: "{{ alertmanager_root_path }}/data"
-alertmanager_log_path: "/var/log/alertmanager"
-alertmanager_log_file: "alertmanager.log"
+alertmanager_log_file: "/var/log/alertmanager/alertmanager.log"
 
 alertmanager_config_snippets_path: "{{ playbook_dir }}/files/alertmanager/config"
 alertmanager_config_templates_path: "{{ playbook_dir }}/files/alertmanager/templates"
@@ -116,3 +117,53 @@ alertmanager_pagerduty_url: ""
 alertmanager_opsgenie_api_host: ""
 alertmanager_hipchat_url: ""
 alertmanager_hipchat_auth_token: ""
+
+pushgateway_version: 0.4.0
+pushgateway_release_system: linux-amd64
+pushgateway_release_name: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}"
+pushgateway_package: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}.tar.gz"
+pushgateway_url: "https://github.com/prometheus/pushgateway/releases/download/v{{ pushgateway_version }}/{{ pushgateway_package }}"
+pushgateway_force_deploy: no
+pushgateway_ssl_verify: yes
+
+pushgateway_external_hostname: "{{ ansible_nodename }}"
+pushgateway_port: 9091
+
+pushgateway_user: "{{ prometheus_user }}"
+pushgateway_group: "{{ prometheus_group }}"
+
+pushgateway_root_path: /opt/pushgateway
+pushgateway_bin_path: "{{ pushgateway_root_path }}/bin"
+pushgateway_releases_path: "{{ pushgateway_root_path }}/releases"
+pushgateway_conf_path: "/etc/pushgateway"
+pushgateway_templates_path: "{{ pushgateway_conf_path }}/conf.d"
+pushgateway_snippets_path: "{{ pushgateway_conf_path }}/snippets"
+pushgateway_log_file: "/var/log/pushgateway/pushgateway.log"
+
+pushgateway_service_options:
+  - "web.listen-address=:{{ pushgateway_port }}"
+
+node_exporter_version: 0.15.2
+node_exporter_release_system: linux-amd64
+node_exporter_release_name: "node_exporter-{{ node_exporter_version }}.{{ node_exporter_release_system }}"
+node_exporter_package: "node_exporter-{{ node_exporter_version }}.{{ node_exporter_release_system }}.tar.gz"
+node_exporter_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/{{ node_exporter_package }}"
+node_exporter_force_deploy: no
+node_exporter_ssl_verify: yes
+
+node_exporter_external_hostname: "{{ ansible_fqdn }}"
+node_exporter_port: 9100
+
+node_exporter_user: "{{ prometheus_user }}"
+node_exporter_group: "{{ prometheus_group }}"
+
+node_exporter_root_path: /opt/node_exporter
+node_exporter_bin_path: "{{ node_exporter_root_path }}/bin"
+node_exporter_releases_path: "{{ node_exporter_root_path }}/releases"
+node_exporter_conf_path: "/etc/node_exporter"
+node_exporter_textfile_path: "/var/lib/node_exporter/textfile_collector"
+node_exporter_log_file: "/var/log/node_exporter/node_exporter.log"
+
+node_exporter_service_options:
+  - "web.listen-address=:{{ node_exporter_port }}"
+  - "collector.textfile.directory={{ node_exporter_textfile_path }}"

@@ -19,6 +19,12 @@ global:
     {{ label.name }}: {{ label.value }}
   {% endfor %}
 
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - {{ prometheus_alertmanager_host }}:{{ prometheus_alertmanager_port }}
+
 rule_files:
 {% for template in prometheus_rules_templates %}
   - {{ prometheus_rules_path }}/{{ template }}
@@ -28,7 +34,7 @@ scrape_configs:
   - job_name: 'prometheus_statistics'
     static_configs:
       - targets:
-        - '{{ ansible_nodename }}:9090'
+        - '{{ prometheus_external_hostname }}:9090'
 
 {% if grafana_host is defined %}
   - job_name: 'grafana'

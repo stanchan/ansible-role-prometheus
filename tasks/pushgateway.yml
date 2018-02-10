@@ -1,0 +1,37 @@
+---
+- name: Check pushgateway version
+  command: "{{ pushgateway_bin_path }}/pushgateway --version"
+  register: pushgateway_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Download pushgateway package
+  get_url:
+    url: "{{ pushgateway_url }}"
+    dest: "{{ pushgateway_releases_path }}"
+    validate_certs: "{{ pushgateway_ssl_verify }}"
+  when: pushgateway_check|failed or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
+
+- name: Extract pushgateway package
+  unarchive:
+    copy: no
+    src: "{{ pushgateway_releases_path }}/{{ pushgateway_package }}"
+    dest: /tmp
+  when: pushgateway_check|failed or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
+
+- name: Copy pushgateway binary
+  copy:
+    src: "/tmp/{{ pushgateway_release_name }}/pushgateway"
+    dest: "{{ pushgateway_bin_path }}/pushgateway"
+    owner: "{{ pushgateway_user }}"
+    group: "{{ pushgateway_group }}"
+    remote_src: True
+    mode: 0755
+  when: pushgateway_check|failed or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
+  notify: restart pushgateway
+
+- name: Link pushgateway binary
+  file:
+    src: "{{ pushgateway_bin_path }}/pushgateway"
+    dest: "/usr/bin/pushgateway"
+    state: link

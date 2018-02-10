@@ -1,0 +1,37 @@
+---
+- name: Check alertmanager version
+  command: "{{ alertmanager_bin_path }}/alertmanager --version"
+  register: alertmanager_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Download alertmanager package
+  get_url:
+    url: "{{ alertmanager_url }}"
+    dest: "{{ alertmanager_releases_path }}"
+    validate_certs: "{{ alertmanager_ssl_verify }}"
+  when: alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
+
+- name: Extract alertmanager package
+  unarchive:
+    copy: no
+    src: "{{ alertmanager_releases_path }}/{{ alertmanager_package }}"
+    dest: /tmp
+  when: alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
+
+- name: Copy alertmanager binary
+  copy:
+    src: "/tmp/{{ alertmanager_release_name }}/alertmanager"
+    dest: "{{ alertmanager_bin_path }}/alertmanager"
+    owner: "{{ alertmanager_user }}"
+    group: "{{ alertmanager_group }}"
+    remote_src: True
+    mode: 0755
+  when: alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
+  notify: restart alertmanager
+
+- name: Link alertmanager binary
+  file:
+    src: "{{ alertmanager_bin_path }}/alertmanager"
+    dest: "/usr/bin/alertmanager"
+    state: link

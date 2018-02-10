@@ -1,0 +1,37 @@
+---
+- name: Check node exporter version
+  command: "{{ node_exporter_bin_path }}/node_exporter --version"
+  register: node_exporter_check
+  changed_when: false
+  ignore_errors: true
+
+- name: Download node exporter package
+  get_url:
+    url: "{{ node_exporter_url }}"
+    dest: "{{ node_exporter_releases_path }}"
+    validate_certs: "{{ node_exporter_ssl_verify }}"
+  when: node_exporter_check|failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
+
+- name: Extract node exporter package
+  unarchive:
+    copy: no
+    src: "{{ node_exporter_releases_path }}/{{ node_exporter_package }}"
+    dest: /tmp
+  when: node_exporter_check|failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
+
+- name: Copy node exporter binary
+  copy:
+    src: "/tmp/{{ node_exporter_release_name }}/node_exporter"
+    dest: "{{ node_exporter_bin_path }}/node_exporter"
+    owner: "{{ node_exporter_user }}"
+    group: "{{ node_exporter_group }}"
+    remote_src: True
+    mode: 0755
+  when: node_exporter_check|failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
+  notify: restart node exporter
+
+- name: Link node exporter binary
+  file:
+    src: "{{ node_exporter_bin_path }}/node_exporter"
+    dest: "/usr/bin/node_exporter"
+    state: link

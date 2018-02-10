@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus pushgateway service
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ pushgateway_user }}
+Group={{ pushgateway_group }}
+Restart=on-failure
+ExecStart=/bin/sh -c "{{ pushgateway_bin_path }}/pushgateway {% for option in pushgateway_service_options %}--{{ option }} {% endfor %}> {{ pushgateway_log_file }} 2>&1"
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

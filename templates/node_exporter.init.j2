@@ -1,11 +1,11 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          prometheus
+# Provides:          node_exporter
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Short-Description: Monitoring system and time series database.
+# Short-Description: Prometheus node exporter.
 # Description:       Prometheus is a systems and service monitoring system.
 #                    It collects metrics from configured targets at given intervals,
 #                    evaluates rule expressions, displays the results,
@@ -17,14 +17,14 @@
 ## This is the last section you should need to change anything in.
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
-DESC="Monitoring System"
-NAME=prometheus
-USER={{ prometheus_user }}
-GROUP={{ prometheus_group }}
-ROOT={{ prometheus_root_path }}
-LOG_PATH={{ prometheus_log_file | dirname }}
-LOG_FILE={{ prometheus_log_file | basename }}
-DAEMON={{ prometheus_bin_path }}/$NAME
+DESC="Node Exporter"
+NAME=node_exporter
+USER={{ node_exporter_user }}
+GROUP={{ node_exporter_group }}
+ROOT={{ node_exporter_root_path }}
+LOG_PATH={{ node_exporter_log_file | dirname }}
+LOG_FILE={{ node_exporter_log_file | basename }}
+DAEMON={{ node_exporter_bin_path }}/$NAME
 DAEMON_ARGS="{% for option in alertmanager_service_options %}--{{ option }} {% endfor %}"                  # you can pass any flags to your program here
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME

@@ -1,28 +1,60 @@
 ---
 - name: Set is_prometheus if in prometheus group
   set_fact:
-    is_prometheus: "{{ inventory_hostname in groups['prometheus'] }}"
+    is_prometheus: "{{ inventory_hostname in groups['prometheus'] | default([]) }}"
 
 - name: Set is_alertmanager if in alertmanager group
   set_fact:
-    is_alertmanager: "{{ inventory_hostname in groups['alertmanager'] }}"
+    is_alertmanager: "{{ inventory_hostname in groups['alertmanager'] | default([]) }}"
+
+- name: Set is_pushgateway if in pushgateway group
+  set_fact:
+    is_pushgateway: "{{ inventory_hostname in groups['pushgateway'] | default([]) }}"
+
+- name: Set is_node_exporter if in node_exporter group
+  set_fact:
+    is_node_exporter: "{{ inventory_hostname in groups['node_exporter'] | default([]) }}"
 
 - name: Setup prereqs
-  include: prereqs.yml
+  include_tasks: prereqs.yml
   tags:
     - install
 
-- name: Install apps
-  include: install.yml
+- name: Install gosu
+  include_tasks: gosu.yml
+  tags:
+    - install
+
+- name: Install prometheus
+  include_tasks: prometheus.yml
+  when: is_prometheus
+  tags:
+    - install
+
+- name: Install alertmanager
+  include_tasks: alertmanager.yml
+  when: is_alertmanager
+  tags:
+    - install
+
+- name: Install pushgateway
+  include_tasks: pushgateway.yml
+  when: is_pushgateway
+  tags:
+    - install
+
+- name: Install node exporter
+  include_tasks: node_exporter.yml
+  when: is_node_exporter
   tags:
     - install
 
 - name: Setup configs
-  include: config.yml
+  include_tasks: config.yml
   tags:
     - config
 
 - name: Setup services
-  include: service.yml
+  include_tasks: service.yml
   tags:
     - config

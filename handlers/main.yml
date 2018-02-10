@@ -13,3 +13,13 @@
   service:
     name: alertmanager
     state: restarted
+
+- name: restart pushgateway
+  service:
+    name: pushgateway
+    state: restarted
+
+- name: restart node exporter
+  service:
+    name: node_exporter
+    state: restarted

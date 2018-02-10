@@ -1,78 +1,135 @@
 ---
-
-- name: Setup apt
-  include: apt.yml
-
 - name: Install dependent packages
   apt:
     pkg: "{{ item }}"
     state: present
+    update_cache: yes
+    cache_valid_time: 3600
   with_items: "{{ required_packages }}"
 
-- name: Create prometheus group
-  group:
-    name: "{{ prometheus_group }}"
-    system: yes
-    state: present
+- block:
+  - name: Create prometheus group
+    group:
+      name: "{{ prometheus_group }}"
+      system: yes
+      state: present
+
+  - name: Create prometheus user
+    user:
+      name: "{{ prometheus_user }}"
+      state: present
+      comment: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      shell: /sbin/nologin
+      createhome: no
+      system: yes
+
+  - name: Check filesystem paths
+    file:
+      dest: "{{ item }}"
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      state: directory
+    with_items:
+      - "{{ prometheus_root_path }}"
+      - "{{ prometheus_releases_path }}"
+      - "{{ prometheus_bin_path }}"
+      - "{{ prometheus_conf_path }}"
+      - "{{ prometheus_rules_path }}"
+      - "{{ prometheus_snippets_path }}"
+      - "{{ prometheus_data_path }}"
+      - "{{ prometheus_log_file | dirname }}"
   when: is_prometheus
 
-- name: Create prometheus user
-  user:
-    name: "{{ prometheus_user }}"
-    state: present
-    comment: "{{ prometheus_user }}"
-    group: "{{ prometheus_group }}"
-    shell: /sbin/nologin
-    createhome: no
-    system: yes
-  when: is_prometheus
+- block:
+  - name: Ensure alertmanager group
+    group:
+      name: "{{ alertmanager_group }}"
+      system: yes
+      state: present
 
-- name: Check filesystem paths
-  file:
-    dest: "{{ item }}"
-    owner: "{{ prometheus_user }}"
-    group: "{{ prometheus_group }}"
-    state: directory
-  with_items:
-    - "{{ prometheus_root_path }}"
-    - "{{ prometheus_releases_path }}"
-    - "{{ prometheus_bin_path }}"
-    - "{{ prometheus_conf_path }}"
-    - "{{ prometheus_rules_path }}"
-    - "{{ prometheus_snippets_path }}"
-    - "{{ prometheus_data_path }}"
-    - "{{ prometheus_log_path }}"
-  when: is_prometheus
+  - name: Ensure alertmanager user
+    user:
+      name: "{{ alertmanager_user }}"
+      state: present
+      group: "{{ alertmanager_group }}"
+      shell: /sbin/nologin
+      createhome: no
+      system: yes
 
-- name: Ensure alertmanager group
-  group:
-    name: "{{ alertmanager_group }}"
-    system: yes
-    state: present
+  - name: Ensure skeleton paths
+    file:
+      dest: "{{ item }}"
+      owner: "{{ alertmanager_user }}"
+      group: "{{ alertmanager_group }}"
+      state: directory
+    with_items:
+      - "{{ alertmanager_root_path }}"
+      - "{{ alertmanager_releases_path }}"
+      - "{{ alertmanager_bin_path }}"
+      - "{{ alertmanager_conf_path }}"
+      - "{{ alertmanager_snippets_path }}"
+      - "{{ alertmanager_templates_path }}"
+      - "{{ alertmanager_log_file | dirname }}"
   when: is_alertmanager
 
-- name: Ensure alertmanager user
-  user:
-    name: "{{ alertmanager_user }}"
-    state: present
-    group: "{{ alertmanager_group }}"
-    shell: /sbin/nologin
-    createhome: no
-    system: yes
-  when: is_alertmanager
+- block:
+  - name: Ensure pushgateway group
+    group:
+      name: "{{ pushgateway_group }}"
+      system: yes
+      state: present
 
-- name: Ensure skeleton paths
-  file:
-    dest: "{{ item }}"
-    owner: "{{ alertmanager_user }}"
-    group: "{{ alertmanager_user }}"
-    state: directory
-  with_items:
-    - "{{ alertmanager_root_path }}"
-    - "{{ alertmanager_releases_path }}"
-    - "{{ alertmanager_bin_path }}"
-    - "{{ alertmanager_conf_path }}"
-    - "{{ alertmanager_snippets_path }}"
-    - "{{ alertmanager_templates_path }}"
-    - "{{ alertmanager_log_path }}"
-  when: is_alertmanager
+  - name: Ensure pushgateway user
+    user:
+      name: "{{ pushgateway_user }}"
+      state: present
+      group: "{{ pushgateway_group }}"
+      shell: /sbin/nologin
+      createhome: no
+      system: yes
+
+  - name: Ensure skeleton paths
+    file:
+      dest: "{{ item }}"
+      owner: "{{ pushgateway_user }}"
+      group: "{{ pushgateway_group }}"
+      state: directory
+    with_items:
+      - "{{ pushgateway_root_path }}"
+      - "{{ pushgateway_releases_path }}"
+      - "{{ pushgateway_bin_path }}"
+      - "{{ pushgateway_conf_path }}"
+      - "{{ pushgateway_log_file | dirname }}"
+  when: is_pushgateway
+
+- block:
+  - name: Ensure node exporter group
+    group:
+      name: "{{ node_exporter_group }}"
+      system: yes
+      state: present
+
+  - name: Ensure node exporter user
+    user:
+      name: "{{ node_exporter_user }}"
+      state: present
+      group: "{{ node_exporter_group }}"
+      shell: /sbin/nologin
+      createhome: no
+      system: yes
+
+  - name: Ensure skeleton paths
+    file:
+      dest: "{{ item }}"
+      owner: "{{ node_exporter_user }}"
+      group: "{{ node_exporter_group }}"
+      state: directory
+    with_items:
+      - "{{ node_exporter_root_path }}"
+      - "{{ node_exporter_releases_path }}"
+      - "{{ node_exporter_bin_path }}"
+      - "{{ node_exporter_conf_path }}"
+      - "{{ node_exporter_textfile_path }}"
+      - "{{ node_exporter_log_file | dirname }}"
+  when: is_node_exporter
