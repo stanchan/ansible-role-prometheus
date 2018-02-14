@@ -7,14 +7,12 @@ After=network-online.target
 Type=simple
 User={{ prometheus_user }}
 Group={{ prometheus_group }}
-RuntimeDirectory=prometheus_server
+Restart=on-failure
 ExecStart=/bin/sh -c "{{ prometheus_bin_path }}/prometheus {% for option in prometheus_options %}--{{ option }} {% endfor %}> {{ prometheus_log_file }} 2>&1"
-ExecStartPost=/bin/sh -c "echo $MAINPID > /run/prometheus_server/prometheus_server.pid"
 ExecReload=/bin/kill -HUP $MAINPID
-PIDFile=/run/prometheus_server/prometheus_server.pid
-PrivateTmp=yes
 KillSignal=SIGTERM
 LimitNOFILE=49152
+TimeoutStopSec=20
 
 [Install]
 WantedBy=multi-user.target

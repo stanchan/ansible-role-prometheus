@@ -11,6 +11,8 @@ Restart=on-failure
 ExecStart=/bin/sh -c "{{ node_exporter_bin_path }}/node_exporter {% for option in node_exporter_service_options %}--{{ option }} {% endfor %}> {{ node_exporter_log_file }} 2>&1"
 ExecReload=/bin/kill -HUP $MAINPID
 KillSignal=SIGTERM
+LimitNOFILE=10000
+TimeoutStopSec=20
 
 [Install]
 WantedBy=multi-user.target

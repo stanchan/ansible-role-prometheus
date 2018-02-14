@@ -1,108 +1,150 @@
 ---
+- name: Check for init.d service
+  set_fact:
+    is_service: yes
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14"
+
+- name: Check for systemd service
+  set_fact:
+    is_systemd: yes
+  when: (ansible_os_family  == "RedHat" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "16") or (ansible_distribution == "Debian" and ansible_distribution_major_version >= "8")
+
 - block:
-  - name: Create prometheus sysv init script (Ubuntu 14.04)
-    template:
-      src: prometheus.init.j2
-      dest: /etc/init.d/prometheus
-      owner: root
-      group: root
-      mode: 0755
-    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14"
+  - block:
+    - name: Create prometheus sysv init script (Ubuntu 14.04)
+      template:
+        src: prometheus.init.j2
+        dest: /etc/init.d/prometheus
+        owner: root
+        group: root
+        mode: 0755
 
-  - name: Create prometheus systemd service
-    template:
-      src: prometheus.service.j2
-      dest: "{{ systemd_service_dir }}/prometheus.service"
-      owner: root
-      group: root
-      mode: 0755
-    when: (ansible_os_family  == "RedHat" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "16") or (ansible_distribution == "Debian" and ansible_distribution_major_version >= "8")
+    - name: Enable prometheus service
+      service:
+        name: prometheus
+        enabled: yes
+        state: started
+    when: is_service
 
-  - name: Enable prometheus service
-    service:
-      name: prometheus
-      enabled: yes
-      state: started
+  - block:
+    - name: Create prometheus systemd service
+      template:
+        src: prometheus.service.j2
+        dest: "{{ systemd_service_dir }}/prometheus.service"
+        owner: root
+        group: root
+        mode: 0755
 
+    - name: Enable prometheus systemd service
+      systemd:
+        name: prometheus
+        enabled: yes
+        daemon-reload: yes
+        state: started
+    when: is_systemd
   when: is_prometheus
 
 - block:
-  - name: Create alertmanager sysv init script (Ubuntu 14.04)
-    template:
-      src: alertmanager.init.j2
-      dest: /etc/init.d/alertmanager
-      owner: root
-      group: root
-      mode: 0755
-    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14"
+  - block:
+    - name: Create alertmanager sysv init script (Ubuntu 14.04)
+      template:
+        src: alertmanager.init.j2
+        dest: /etc/init.d/alertmanager
+        owner: root
+        group: root
+        mode: 0755
 
-  - name: Create alertmanager systemd service
-    template:
-      src: alertmanager.service.j2
-      dest: "{{ systemd_service_dir }}/alertmanager.service"
-      owner: root
-      group: root
-      mode: 0755
-    when: (ansible_os_family  == "RedHat" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "16") or (ansible_distribution == "Debian" and ansible_distribution_major_version >= "8")
+    - name: Enable alertmanager service
+      service:
+        name: alertmanager
+        enabled: yes
+        state: started
+    when: is_service
 
-  - name: Enable alertmanager service
-    service:
-      name: alertmanager
-      enabled: yes
-      state: started
+  - block:
+    - name: Create alertmanager systemd service
+      template:
+        src: alertmanager.service.j2
+        dest: "{{ systemd_service_dir }}/alertmanager.service"
+        owner: root
+        group: root
+        mode: 0755
 
+    - name: Enable alertmanager systemd service
+      systemd:
+        name: alertmanager
+        enabled: yes
+        daemon-reload: yes
+        state: started
+    when: is_systemd
   when: is_alertmanager
 
 - block:
-  - name: Create pushgateway sysv init script (Ubuntu 14.04)
-    template:
-      src: pushgateway.init.j2
-      dest: /etc/init.d/pushgateway
-      owner: root
-      group: root
-      mode: 0755
-    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14"
+  - block:
+    - name: Create pushgateway sysv init script (Ubuntu 14.04)
+      template:
+        src: pushgateway.init.j2
+        dest: /etc/init.d/pushgateway
+        owner: root
+        group: root
+        mode: 0755
 
-  - name: Create pushgateway systemd service
-    template:
-      src: pushgateway.service.j2
-      dest: "{{ systemd_service_dir }}/pushgateway.service"
-      owner: root
-      group: root
-      mode: 0755
-    when: (ansible_os_family  == "RedHat" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "16") or (ansible_distribution == "Debian" and ansible_distribution_major_version >= "8")
+    - name: Enable pushgateway service
+      service:
+        name: pushgateway
+        enabled: yes
+        state: started
+    when: is_service
 
-  - name: Enable pushgateway service
-    service:
-      name: pushgateway
-      enabled: yes
-      state: started
+  - block:
+    - name: Create pushgateway systemd service
+      template:
+        src: pushgateway.service.j2
+        dest: "{{ systemd_service_dir }}/pushgateway.service"
+        owner: root
+        group: root
+        mode: 0755
 
+    - name: Enable pushgateway systemd service
+      systemd:
+        name: pushgateway
+        enabled: yes
+        daemon-reload: yes
+        state: started
+    when: is_systemd
   when: is_pushgateway
 
 - block:
-  - name: Create node exporter sysv init script (Ubuntu 14.04)
-    template:
-      src: node_exporter.init.j2
-      dest: /etc/init.d/node_exporter
-      owner: root
-      group: root
-      mode: 0755
-    when: ansible_distribution == "Ubuntu" and ansible_distribution_major_version == "14"
+  - block:
+    - name: Create node_exporter sysv init script (Ubuntu 14.04)
+      template:
+        src: node_exporter.init.j2
+        dest: /etc/init.d/node_exporter
+        owner: root
+        group: root
+        mode: 0755
 
-  - name: Create node exporter systemd service
-    template:
-      src: node_exporter.service.j2
-      dest: "{{ systemd_service_dir }}/node_exporter.service"
-      owner: root
-      group: root
-      mode: 0755
-    when: (ansible_os_family  == "RedHat" and ansible_distribution_major_version >= "7") or (ansible_distribution == "Ubuntu" and ansible_distribution_major_version >= "16") or (ansible_distribution == "Debian" and ansible_distribution_major_version >= "8")
+    - name: Enable node_exporter service
+      service:
+        name: node_exporter
+        enabled: yes
+        state: started
+    when: is_service
 
-  - name: Enable node exporter service
-    service:
-      name: node_exporter
-      enabled: yes
-      state: started
+  - block:
+    - name: Create node_exporter systemd service
+      template:
+        src: node_exporter.service.j2
+        dest: "{{ systemd_service_dir }}/node_exporter.service"
+        owner: root
+        group: root
+        mode: 0755
 
+    - name: Enable node_exporter systemd service
+      systemd:
+        name: node_exporter
+        enabled: yes
+        daemon-reload: yes
+        state: started
+    when: is_systemd
   when: is_node_exporter

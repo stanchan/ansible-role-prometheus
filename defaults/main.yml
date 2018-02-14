@@ -1,6 +1,8 @@
 ---
 required_packages: []
 systemd_service_dir: /lib/systemd/system
+is_service: no
+is_systemd: no
 
 gosu_version: "1.10"
 gosu_release_system: amd64
@@ -55,6 +57,7 @@ prometheus_options:
   - "storage.tsdb.retention={{ prometheus_storage_retention }}"
   - "storage.tsdb.path={{ prometheus_data_path }}"
   - "web.external-url=http://{{ prometheus_external_hostname }}:{{ prometheus_port }}/"
+  - "web.enable-lifecycle"
   - "config.file={{ prometheus_conf_path }}/prometheus.yml"
 
 default_app:
