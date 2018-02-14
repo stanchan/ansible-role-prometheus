@@ -25,7 +25,7 @@
     dest: "{{ alertmanager_bin_path }}/alertmanager"
     owner: "{{ alertmanager_user }}"
     group: "{{ alertmanager_group }}"
-    remote_src: True
+    remote_src: yes
     mode: 0755
   when: alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
   notify: restart alertmanager

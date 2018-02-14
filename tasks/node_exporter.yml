@@ -25,7 +25,7 @@
     dest: "{{ node_exporter_bin_path }}/node_exporter"
     owner: "{{ node_exporter_user }}"
     group: "{{ node_exporter_group }}"
-    remote_src: True
+    remote_src: yes
     mode: 0755
   when: node_exporter_check|failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
   notify: restart node exporter

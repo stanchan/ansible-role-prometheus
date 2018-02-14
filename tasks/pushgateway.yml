@@ -25,7 +25,7 @@
     dest: "{{ pushgateway_bin_path }}/pushgateway"
     owner: "{{ pushgateway_user }}"
     group: "{{ pushgateway_group }}"
-    remote_src: True
+    remote_src: yes
     mode: 0755
   when: pushgateway_check|failed or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
   notify: restart pushgateway
