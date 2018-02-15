@@ -2,8 +2,8 @@
 - name: Check node exporter version
   command: "{{ node_exporter_bin_path }}/node_exporter --version"
   register: node_exporter_check
-  changed_when: false
-  ignore_errors: true
+  changed_when: no
+  ignore_errors: yes
 
 - name: Download node exporter package
   get_url:
@@ -35,3 +35,4 @@
     src: "{{ node_exporter_bin_path }}/node_exporter"
     dest: "/usr/bin/node_exporter"
     state: link
+  ignore_errors: yes

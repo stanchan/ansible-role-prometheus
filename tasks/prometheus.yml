@@ -5,7 +5,7 @@
     chdir: "{{ prometheus_bin_path }}"
   register: prometheus_check
   ignore_errors: yes
-  changed_when: false
+  changed_when: no
 
 - name: Download prometheus package
   get_url:

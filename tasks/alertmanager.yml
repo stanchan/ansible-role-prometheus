@@ -2,8 +2,8 @@
 - name: Check alertmanager version
   command: "{{ alertmanager_bin_path }}/alertmanager --version"
   register: alertmanager_check
-  changed_when: false
-  ignore_errors: true
+  changed_when: no
+  ignore_errors: yes
 
 - name: Download alertmanager package
   get_url:

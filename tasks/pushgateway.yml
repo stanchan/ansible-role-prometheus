@@ -2,8 +2,8 @@
 - name: Check pushgateway version
   command: "{{ pushgateway_bin_path }}/pushgateway --version"
   register: pushgateway_check
-  changed_when: false
-  ignore_errors: true
+  changed_when: no
+  ignore_errors: yes
 
 - name: Download pushgateway package
   get_url:
@@ -35,3 +35,4 @@
     src: "{{ pushgateway_bin_path }}/pushgateway"
     dest: "/usr/bin/pushgateway"
     state: link
+  ignore_errors: yes
