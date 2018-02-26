@@ -1,10 +1,8 @@
 ---
 - name: Install dependent packages
-  apt:
-    pkg: "{{ item }}"
+  package:
+    name: "{{ item }}"
     state: present
-    update_cache: yes
-    cache_valid_time: 3600
   with_items: "{{ required_packages }}"
 
 - block:
@@ -57,7 +55,7 @@
       createhome: no
       system: yes
 
-  - name: Ensure skeleton paths
+  - name: Ensure alertmanager paths
     file:
       dest: "{{ item }}"
       owner: "{{ alertmanager_user }}"
@@ -89,7 +87,7 @@
       createhome: no
       system: yes
 
-  - name: Ensure skeleton paths
+  - name: Ensure pushgateway paths
     file:
       dest: "{{ item }}"
       owner: "{{ pushgateway_user }}"
@@ -119,7 +117,7 @@
       createhome: no
       system: yes
 
-  - name: Ensure skeleton paths
+  - name: Ensure node exporter paths
     file:
       dest: "{{ item }}"
       owner: "{{ node_exporter_user }}"
