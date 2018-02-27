@@ -1,6 +1,6 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          alertmanager
+# Provides:          {{ alertmanager_service_name }}
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
@@ -18,7 +18,7 @@
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
 DESC="Alert Manager"
-NAME=alertmanager
+NAME={{ alertmanager_service_name }}
 USER={{ alertmanager_user }}
 GROUP={{ alertmanager_group }}
 ROOT={{ alertmanager_root_path }}

@@ -1,6 +1,6 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          pushgateway
+# Provides:          {{ pushgateway_service_name }}
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
@@ -18,7 +18,7 @@
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
 DESC="Push Gateway"
-NAME=pushgateway
+NAME={{ pushgateway_service_name }}
 USER={{ pushgateway_user }}
 GROUP={{ pushgateway_group }}
 ROOT={{ pushgateway_root_path }}

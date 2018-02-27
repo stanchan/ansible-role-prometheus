@@ -17,6 +17,7 @@ prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ 
 prometheus_force_deploy: no
 prometheus_ssl_verify: yes
 
+prometheus_service_name: prometheus
 prometheus_external_hostname: "{{ ansible_hostname }}"
 prometheus_port: 9090
 
@@ -83,6 +84,7 @@ alertmanager_url: "https://github.com/prometheus/alertmanager/releases/download/
 alertmanager_force_deploy: no
 alertmanager_ssl_verify: yes
 
+alertmanager_service_name: alertmanager
 alertmanager_external_hostname: "{{ ansible_nodename }}"
 alertmanager_port: 9093
 
@@ -129,6 +131,7 @@ pushgateway_url: "https://github.com/prometheus/pushgateway/releases/download/v{
 pushgateway_force_deploy: no
 pushgateway_ssl_verify: yes
 
+pushgateway_service_name: pushgateway
 pushgateway_external_hostname: "{{ ansible_nodename }}"
 pushgateway_port: 9091
 
@@ -154,6 +157,7 @@ node_exporter_url: "https://github.com/prometheus/node_exporter/releases/downloa
 node_exporter_force_deploy: no
 node_exporter_ssl_verify: yes
 
+node_exporter_service_name: node_exporter
 node_exporter_external_hostname: "{{ ansible_fqdn }}"
 node_exporter_port: 9100
 

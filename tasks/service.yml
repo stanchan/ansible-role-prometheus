@@ -14,14 +14,14 @@
     - name: Create prometheus sysv init script (Ubuntu 14.04)
       template:
         src: prometheus.init.j2
-        dest: /etc/init.d/prometheus
+        dest: "/etc/init.d/{{ prometheus_service_name }}"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable prometheus service
       service:
-        name: prometheus
+        name: "{{ prometheus_service_name }}"
         enabled: yes
         state: started
     when: is_service
@@ -30,14 +30,14 @@
     - name: Create prometheus systemd service
       template:
         src: prometheus.service.j2
-        dest: "{{ systemd_service_dir }}/prometheus.service"
+        dest: "{{ systemd_service_dir }}/{{ prometheus_service_name }}.service"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable prometheus systemd service
       systemd:
-        name: prometheus
+        name: "{{ prometheus_service_name }}"
         enabled: yes
         daemon-reload: yes
         state: started
@@ -49,14 +49,14 @@
     - name: Create alertmanager sysv init script (Ubuntu 14.04)
       template:
         src: alertmanager.init.j2
-        dest: /etc/init.d/alertmanager
+        dest: "/etc/init.d/{{ alertmanager_service_name }}"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable alertmanager service
       service:
-        name: alertmanager
+        name: "{{ alertmanager_service_name }}"
         enabled: yes
         state: started
     when: is_service
@@ -65,14 +65,14 @@
     - name: Create alertmanager systemd service
       template:
         src: alertmanager.service.j2
-        dest: "{{ systemd_service_dir }}/alertmanager.service"
+        dest: "{{ systemd_service_dir }}/{{ alertmanager_service_name }}.service"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable alertmanager systemd service
       systemd:
-        name: alertmanager
+        name: "{{ alertmanager_service_name }}"
         enabled: yes
         daemon-reload: yes
         state: started
@@ -84,14 +84,14 @@
     - name: Create pushgateway sysv init script (Ubuntu 14.04)
       template:
         src: pushgateway.init.j2
-        dest: /etc/init.d/pushgateway
+        dest: "/etc/init.d/{{ pushgateway_service_name }}"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable pushgateway service
       service:
-        name: pushgateway
+        name: "{{ pushgateway_service_name }}"
         enabled: yes
         state: started
     when: is_service
@@ -100,14 +100,14 @@
     - name: Create pushgateway systemd service
       template:
         src: pushgateway.service.j2
-        dest: "{{ systemd_service_dir }}/pushgateway.service"
+        dest: "{{ systemd_service_dir }}/{{ pushgateway_service_name }}.service"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable pushgateway systemd service
       systemd:
-        name: pushgateway
+        name: "{{ pushgateway_service_name }}"
         enabled: yes
         daemon-reload: yes
         state: started
@@ -119,14 +119,14 @@
     - name: Create node_exporter sysv init script (Ubuntu 14.04)
       template:
         src: node_exporter.init.j2
-        dest: /etc/init.d/node_exporter
+        dest: "/etc/init.d/{{ node_exporter_service_name }}"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable node_exporter service
       service:
-        name: node_exporter
+        name: "{{ node_exporter_service_name }}"
         enabled: yes
         state: started
     when: is_service
@@ -135,14 +135,14 @@
     - name: Create node_exporter systemd service
       template:
         src: node_exporter.service.j2
-        dest: "{{ systemd_service_dir }}/node_exporter.service"
+        dest: "{{ systemd_service_dir }}/{{ node_exporter_service_name }}.service"
         owner: root
         group: root
         mode: 0755
 
     - name: Enable node_exporter systemd service
       systemd:
-        name: node_exporter
+        name: "{{ node_exporter_service_name }}"
         enabled: yes
         daemon-reload: yes
         state: started

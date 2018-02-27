@@ -1,6 +1,6 @@
 #! /bin/sh
 ### BEGIN INIT INFO
-# Provides:          node_exporter
+# Provides:          {{ node_exporter_service_name }}
 # Required-Start:    $remote_fs $syslog
 # Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
@@ -18,7 +18,7 @@
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/usr/local/sbin:/bin:/usr/bin:/usr/local/bin
 DESC="Node Exporter"
-NAME=node_exporter
+NAME={{ node_exporter_service_name }}
 USER={{ node_exporter_user }}
 GROUP={{ node_exporter_group }}
 ROOT={{ node_exporter_root_path }}
