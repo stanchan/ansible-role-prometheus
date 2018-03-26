@@ -9,7 +9,7 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.1.0
+prometheus_version: 2.2.1
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}.tar.gz"
@@ -58,6 +58,7 @@ prometheus_options:
   - "storage.tsdb.retention={{ prometheus_storage_retention }}"
   - "storage.tsdb.path={{ prometheus_data_path }}"
   - "web.external-url=http://{{ prometheus_external_hostname }}:{{ prometheus_port }}/"
+  - "web.enable-admin-api"
   - "web.enable-lifecycle"
   - "config.file={{ prometheus_conf_path }}/prometheus.yml"
 
@@ -76,7 +77,7 @@ default_app:
       it: 0
       pt: 0
 
-alertmanager_version: 0.13.0
+alertmanager_version: 0.14.0
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
 alertmanager_package: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}.tar.gz"
