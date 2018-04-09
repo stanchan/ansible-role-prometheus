@@ -9,6 +9,7 @@
   delaycompress
   create 664 {{ prometheus_user }} {{ prometheus_group }}
   postrotate
-        {% if ansible_service_mgr == "init" %}[ ! -f /var/run/prometheus.pid ] || service prometheus restart{% else %}[ ! -f /run/prometheus.pid ] || systemctl restart prometheus.service{% endif %}
+        {% if ansible_service_mgr == "init" %}[ ! -f /run/prometheus.pid ] || systemctl restart prometheus.service{% else %}[ ! -f /var/run/prometheus.pid ] || service prometheus restart{% endif %}
+
   endscript
 }
