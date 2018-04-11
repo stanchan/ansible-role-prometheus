@@ -25,7 +25,7 @@ ROOT={{ node_exporter_root_path }}
 LOG_PATH={{ node_exporter_log_file | dirname }}
 LOG_FILE={{ node_exporter_log_file | basename }}
 DAEMON={{ node_exporter_bin_path }}/$NAME
-DAEMON_ARGS="{% for option in alertmanager_service_options %}--{{ option }} {% endfor %}"                  # you can pass any flags to your program here
+DAEMON_ARGS="{% for option in node_exporter_service_options %}--{{ option }} {% endfor %}"                  # you can pass any flags to your program here
 PIDFILE=/var/run/$NAME.pid
 SCRIPTNAME=/etc/init.d/$NAME
 
