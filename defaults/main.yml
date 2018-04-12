@@ -150,7 +150,7 @@ pushgateway_log_file: "/var/log/pushgateway/pushgateway.log"
 pushgateway_service_options:
   - "web.listen-address=:{{ pushgateway_port }}"
 
-node_exporter_version: 0.15.2
+node_exporter_version: 0.16.0-rc.1
 node_exporter_release_system: linux-amd64
 node_exporter_release_name: "node_exporter-{{ node_exporter_version }}.{{ node_exporter_release_system }}"
 node_exporter_package: "node_exporter-{{ node_exporter_version }}.{{ node_exporter_release_system }}.tar.gz"
