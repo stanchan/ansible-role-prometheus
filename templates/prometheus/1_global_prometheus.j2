@@ -23,7 +23,9 @@ alerting:
   alertmanagers:
   - static_configs:
     - targets:
-      - {{ prometheus_alertmanager_host }}:{{ prometheus_alertmanager_port }}
+{% for am_host in prometheus_alertmanager_hosts %}
+      - {{ am_host }}
+{% endfor %}
 
 rule_files:
 {% for template in prometheus_rules_templates %}

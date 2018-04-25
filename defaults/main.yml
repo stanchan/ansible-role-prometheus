@@ -32,6 +32,8 @@ prometheus_rules_path: "{{ prometheus_conf_path }}/rules"
 prometheus_snippets_path: "{{ prometheus_conf_path }}/snippets"
 prometheus_data_path: "{{ prometheus_root_path }}/data"
 prometheus_log_file: "/var/log/prometheus/prometheus.log"
+prometheus_template_configs:
+  - "1_global_prometheus"
 
 prometheus_config_scrapes_files_path: "{{ playbook_dir }}/files/prometheus/config/scrapes"
 prometheus_config_scrapes_templates_path: "{{ playbook_dir }}/templates/prometheus/config/scrapes"
@@ -49,6 +51,9 @@ prometheus_scrape_timeout: 10s
 prometheus_evaluation_interval: 1m
 prometheus_external_labels: []
 
+prometheus_alertmanager_hosts:
+  - "{{ prometheus_alertmanager_host }}:{{ prometheus_alertmanager_port }}"
+
 prometheus_alertmanager_host: localhost
 prometheus_alertmanager_port: 9093
 
@@ -61,21 +66,6 @@ prometheus_options:
   - "web.enable-admin-api"
   - "web.enable-lifecycle"
   - "config.file={{ prometheus_conf_path }}/prometheus.yml"
-
-default_app:
-  server: 'default'
-  services:
-    - 9100
-    - 9110
-  inventory:
-    pro:
-      es: 0
-      it: 0
-      pt: 0
-    pre:
-      es: 0
-      it: 0
-      pt: 0
 
 alertmanager_version: 0.14.0
 alertmanager_release_system: linux-amd64
@@ -100,6 +90,8 @@ alertmanager_templates_path: "{{ alertmanager_conf_path }}/conf.d"
 alertmanager_snippets_path: "{{ alertmanager_conf_path }}/snippets"
 alertmanager_data_path: "{{ alertmanager_root_path }}/data"
 alertmanager_log_file: "/var/log/alertmanager/alertmanager.log"
+alertmanager_template_configs:
+  - "1_global_alertmanager"
 
 alertmanager_config_snippets_path: "{{ playbook_dir }}/files/alertmanager/config"
 alertmanager_config_templates_path: "{{ playbook_dir }}/files/alertmanager/templates"

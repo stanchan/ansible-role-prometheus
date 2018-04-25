@@ -33,23 +33,23 @@ global:
 
 {% endif %}
 {% if alertmanager_pagerduty_url != '' %}
-  # The API URL to use for Slack notifications.
+  # The API URL to use for PagerDuty notifications.
   pagerduty_url: {{ alertmanager_pagerduty_url }}
 
 {% endif %}
 {% if alertmanager_opsgenie_api_host != '' %}
-  # The API URL to use for Slack notifications.
+  # The API URL to use for OpsGenie notifications.
   opsgenie_api_host: {{ alertmanager_opsgenie_api_host }}
 
 {% endif %}
 
 {% if alertmanager_hipchat_url != '' %}
-  # The API URL to use for Slack notifications.
+  # The API URL to use for HipChat notifications.
   hipchat_url: {{ alertmanager_hipchat_url }}
 
 {% endif %}
 {% if alertmanager_hipchat_auth_token != '' %}
-  # The API URL to use for Slack notifications.
+  # The Auth Token to use for HipChat notifications.
   hipchat_auth_token: {{ alertmanager_hipchat_auth_token }}
 
 {% endif %}

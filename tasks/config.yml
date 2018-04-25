@@ -44,8 +44,7 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    with_items:
-      - "1_global_prometheus"
+    with_items: "{{ prometheus_template_configs }}"
 
   - name: Load prometheus scrape vars
     include_vars:
@@ -111,15 +110,14 @@
   when: is_prometheus
 
 - block:
-  - name: Copy alertmanager server common config
+  - name: Copy alertmanager server config templates
     template:
       src: "alertmanager/{{ item }}.j2"
       dest: "{{ alertmanager_snippets_path }}/{{ item }}"
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640
-    with_items:
-      - "1_global_alertmanager"
+    with_items: "{{ alertmanager_template_configs }}"
 
   - name: Copy alertmanager server config snippets
     copy:
