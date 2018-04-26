@@ -92,6 +92,7 @@ alertmanager_data_path: "{{ alertmanager_root_path }}/data"
 alertmanager_log_file: "/var/log/alertmanager/alertmanager.log"
 alertmanager_template_configs:
   - "1_global_alertmanager"
+  - "4_global_receivers"
 
 alertmanager_config_snippets_path: "{{ playbook_dir }}/files/alertmanager/config"
 alertmanager_config_templates_path: "{{ playbook_dir }}/files/alertmanager/templates"

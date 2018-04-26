@@ -53,7 +53,17 @@
     with_fileglob:
       - "{{ prometheus_config_vars_templates_path }}/*"
 
-  - name: Copy prometheus scrapes
+  - name: Copy prometheus scrape files
+    copy:
+      src: "{{ item }}"
+      dest: "{{ prometheus_snippets_path }}/{{ item | basename }}"
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      mode: 0640
+    with_fileglob:
+      - "{{ prometheus_config_scrapes_files_path }}/*"
+
+  - name: Copy prometheus scrape templates
     template:
       src: "{{ item }}"
       dest: "{{ prometheus_snippets_path }}/{{ item | basename | splitext | first }}"

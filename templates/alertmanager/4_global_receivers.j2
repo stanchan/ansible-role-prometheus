@@ -1,0 +1,13 @@
+receivers:
+{% for receiver in alertmanager_smtp_receivers %}
+- name: '{{ receiver.smtp_name }}'
+  email_configs:
+  - to: '{{ receiver.smtp_group }}'
+
+{% endfor %}
+{% for receiver in alertmanager_pagerduty_receivers %}
+- name: '{{ receiver.pagerduty_name }}'
+  pagerduty_configs:
+  - service_key: {{ receiver.pagerduty_key }}
+
+{% endfor %}
