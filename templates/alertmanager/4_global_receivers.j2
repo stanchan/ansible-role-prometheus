@@ -1,7 +1,7 @@
 receivers:
 {% for receiver in alertmanager_receivers %}
 - name: '{{ receiver.name }}'
-{% if receiver.smtp_group %}
+{% if receiver.smtp_groups %}
   email_configs:
 {% for smtp_group in receiver.smtp_groups %}
     - to: '{{ smtp_group }}'
