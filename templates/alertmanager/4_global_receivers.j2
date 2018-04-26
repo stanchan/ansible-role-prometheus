@@ -1,2 +1,23 @@
 receivers:
-{{ alertmanager_receivers | to_nice_yaml(indent=2) }}
+{% for receiver in alertmanager_receivers %}
+- name: '{{ receiver.name }}'
+{% if receiver.smtp_group %}
+  email_configs:
+{% for smtp_group in receiver.smtp_groups %}
+    - to: '{{ smtp_group }}'
+{% endfor %}
+{% endif %}
+{% if receiver.service_keys or receiver.routing_keys %}
+  pagerduty_configs:
+{% if receiver.service_keys %}
+{% for key in receiver.service_keys %}
+    - service_key: {{ key }}
+{% endfor %}
+{% endif %}
+{% if receiver.routing_keys %}
+{% for key in receiver.routing_keys %}
+    - routing_key: {{ key }}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% endfor %}
