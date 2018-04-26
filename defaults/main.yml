@@ -117,6 +117,8 @@ alertmanager_opsgenie_api_host: ""
 alertmanager_hipchat_url: ""
 alertmanager_hipchat_auth_token: ""
 
+alertmanager_receivers: []
+
 pushgateway_version: 0.4.0
 pushgateway_release_system: linux-amd64
 pushgateway_release_name: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}"
