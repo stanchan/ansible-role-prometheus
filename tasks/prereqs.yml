@@ -66,8 +66,8 @@
       - "{{ alertmanager_releases_path }}"
       - "{{ alertmanager_bin_path }}"
       - "{{ alertmanager_conf_path }}"
+      - "{{ alertmanager_conf_templates_path }}"
       - "{{ alertmanager_snippets_path }}"
-      - "{{ alertmanager_templates_path }}"
       - "{{ alertmanager_log_file | dirname }}"
   when: is_alertmanager
 

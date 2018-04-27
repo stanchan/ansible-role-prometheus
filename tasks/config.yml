@@ -12,7 +12,7 @@
     notify:
       - reload prometheus
 
-  - name: Set prometheus rules loaded var
+  - name: Set prometheus rules source templates
     find:
       paths: "{{ prometheus_config_rules_templates_path }}"
       file_type: file
@@ -20,7 +20,7 @@
     become: no
     register: rules_loaded
 
-  - name: Set prometheus rules templates var
+  - name: Set prometheus rules templates
     set_fact:
       prometheus_rules_templates:  "{{ rules_loaded.files | map(attribute='path') | map('basename') | list }}"
 
@@ -37,14 +37,14 @@
     with_items:
       - "{{ check_rules.files | map(attribute='path') | map('basename') | list | difference(prometheus_rules_templates) }}"
 
-  - name: Copy prometheus common server config
+  - name: Copy prometheus common scrape templates
     template:
       src: "prometheus/{{ item }}.j2"
       dest: "{{ prometheus_snippets_path }}/{{ item }}"
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    with_items: "{{ prometheus_template_configs }}"
+    with_items: "{{ prometheus_template_common_configs }}"
 
   - name: Load prometheus scrape vars
     include_vars:
@@ -73,30 +73,38 @@
     with_fileglob:
       - "{{ prometheus_config_scrapes_templates_path }}/*"
 
-  - name: Set prometheus scrapes loaded var
+  - name: Set prometheus scrape source files
+    find:
+      paths: "{{ prometheus_config_scrapes_files_path }}"
+      file_type: file
+    delegate_to: localhost
+    become: no
+    register: prometheus_config_scrapes_files_loaded
+
+  - name: Set prometheus scrape source templates
     find:
       paths: "{{ prometheus_config_scrapes_templates_path }}"
       file_type: file
     delegate_to: localhost
     become: no
-    register: scrapes_loaded
+    register: prometheus_config_scrapes_templates_loaded
 
-  - name: Set prometheus scrapes templates var
+  - name: Set prometheus snippets list
     set_fact:
-      prometheus_scrapes_templates:  "{{ scrapes_loaded.files | map(attribute='path') | map('basename') | map('splitext') | map('first') | list | union(['1_global_prometheus']) }}"
+      prometheus_config_scrapes_load_list:  "{{ ( prometheus_config_scrapes_files_loaded.files + prometheus_config_scrapes_templates_loaded.files ) | map(attribute='path') | map('basename') | map('splitext') | map('first') | list | union(prometheus_template_common_configs) }}"
 
-  - name: Checking prometheus scrapes in path
+  - name: Checking prometheus scrapes in existing path
     find:
       paths: "{{ prometheus_snippets_path }}"
       file_type: file
-    register: check_scrapes
+    register: check_config_scrapes_existing
 
   - name: Remove old prometheus scrapes
     file:
       path: "{{ prometheus_snippets_path }}/{{ item }}"
       state: absent
     with_items:
-      - "{{ check_scrapes.files | map(attribute='path') |  map('basename') | map('splitext') | map('first') | list | difference(prometheus_scrapes_templates) }}"
+      - "{{ check_config_scrapes_existing.files | map(attribute='path') |  map('basename') | map('splitext') | map('first') | list | difference(prometheus_config_scrapes_load_list) }}"
 
   - name: Join prometheus config snippets
     assemble:
@@ -120,16 +128,26 @@
   when: is_prometheus
 
 - block:
-  - name: Copy alertmanager server config templates
+  - name: Copy alertmanager common config templates
     template:
       src: "alertmanager/{{ item }}.j2"
       dest: "{{ alertmanager_snippets_path }}/{{ item }}"
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640
-    with_items: "{{ alertmanager_template_configs }}"
+    with_items: "{{ alertmanager_template_common_configs }}"
 
-  - name: Copy alertmanager server config snippets
+  - name: Copy alertmanager config files
+    copy:
+      src: "{{ item }}"
+      dest: "{{ alertmanager_snippets_path }}/{{ item | basename }}"
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      mode: 0640
+    with_fileglob:
+      - "{{ alertmanager_config_snippets_files_path }}/*"
+
+  - name: Copy alertmanager config templates
     copy:
       src: "{{ item }}"
       dest: "{{ alertmanager_snippets_path }}/{{ item | basename }}"
@@ -137,9 +155,9 @@
       group: "{{ alertmanager_group }}"
       mode: 0640
     with_fileglob:
-      - "{{ alertmanager_config_snippets_path }}/*"
+      - "{{ alertmanager_config_snippets_templates_path }}/*"
 
-  - name: Checking alertmanager snippets
+  - name: Check current alertmanager snippets
     find:
       paths: "{{ alertmanager_snippets_path }}"
       file_type: file
@@ -155,9 +173,41 @@
     with_items:
       - 2_alertmanager_routes
       - 3_alertmanager_inhibit_rules
-      - 4_alertmanager_receivers
     when:
-      - check_snippets.files|length < 2
+      - check_snippets.files|length < 3
+
+  - name: Set alertmanager config source files
+    find:
+      paths: "{{ alertmanager_config_snippets_files_path }}"
+      file_type: file
+    delegate_to: localhost
+    become: no
+    register: alertmanager_config_files_loaded
+
+  - name: Set alertmanager config source templates
+    find:
+      paths: "{{ alertmanager_config_snippets_templates_path }}"
+      file_type: file
+    delegate_to: localhost
+    become: no
+    register: alertmanager_config_templates_loaded
+
+  - name: Set alertmanager snippets consolidated list
+    set_fact:
+      alertmanager_config_load_list:  "{{ ( alertmanager_config_files_loaded.files + alertmanager_config_templates_loaded.files ) | map(attribute='path') | map('basename') | map('splitext') | map('first') | list | union(alertmanager_template_common_configs) }}"
+
+  - name: Checking alertmanager snippets in existing path
+    find:
+      paths: "{{ alertmanager_snippets_path }}"
+      file_type: file
+    register: check_snippets_existing
+
+  - name: Remove old alertmanager snippets
+    file:
+      path: "{{ alertmanager_snippets_path }}/{{ item }}"
+      state: absent
+    with_items:
+      - "{{ check_snippets_existing.files | map(attribute='path') |  map('basename') | map('splitext') | map('first') | list | difference(alertmanager_config_load_list) }}"
 
   - name: Join alertmanager config snippets
     assemble:
@@ -174,7 +224,7 @@
   - name: Copy alertmanager templates
     copy:
       src: "{{ item }}"
-      dest: "{{ alertmanager_templates_path }}/{{ item }}"
+      dest: "{{ alertmanager_conf_templates_path }}/{{ item }}"
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640

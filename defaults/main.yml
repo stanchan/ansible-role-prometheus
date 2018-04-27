@@ -32,7 +32,7 @@ prometheus_rules_path: "{{ prometheus_conf_path }}/rules"
 prometheus_snippets_path: "{{ prometheus_conf_path }}/snippets"
 prometheus_data_path: "{{ prometheus_root_path }}/data"
 prometheus_log_file: "/var/log/prometheus/prometheus.log"
-prometheus_template_configs:
+prometheus_template_common_configs:
   - "1_global_prometheus"
 
 prometheus_config_scrapes_files_path: "{{ playbook_dir }}/files/prometheus/config/scrapes"
@@ -86,15 +86,16 @@ alertmanager_root_path: /opt/alertmanager
 alertmanager_bin_path: "{{ alertmanager_root_path }}/bin"
 alertmanager_releases_path: "{{ alertmanager_root_path }}/releases"
 alertmanager_conf_path: "/etc/alertmanager"
-alertmanager_templates_path: "{{ alertmanager_conf_path }}/conf.d"
+alertmanager_conf_templates_path: "{{ alertmanager_conf_path }}/conf.d"
 alertmanager_snippets_path: "{{ alertmanager_conf_path }}/snippets"
 alertmanager_data_path: "{{ alertmanager_root_path }}/data"
 alertmanager_log_file: "/var/log/alertmanager/alertmanager.log"
-alertmanager_template_configs:
+alertmanager_template_common_configs:
   - "1_global_alertmanager"
   - "4_global_receivers"
 
-alertmanager_config_snippets_path: "{{ playbook_dir }}/files/alertmanager/config"
+alertmanager_config_snippets_files_path: "{{ playbook_dir }}/files/alertmanager/config"
+alertmanager_config_snippets_templates_path: "{{ playbook_dir }}/templates/alertmanager/config"
 alertmanager_config_templates_path: "{{ playbook_dir }}/files/alertmanager/templates"
 
 alertmanager_service_options:
@@ -139,8 +140,6 @@ pushgateway_root_path: /opt/pushgateway
 pushgateway_bin_path: "{{ pushgateway_root_path }}/bin"
 pushgateway_releases_path: "{{ pushgateway_root_path }}/releases"
 pushgateway_conf_path: "/etc/pushgateway"
-pushgateway_templates_path: "{{ pushgateway_conf_path }}/conf.d"
-pushgateway_snippets_path: "{{ pushgateway_conf_path }}/snippets"
 pushgateway_log_file: "/var/log/pushgateway/pushgateway.log"
 
 pushgateway_service_options:
