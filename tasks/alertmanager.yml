@@ -10,14 +10,14 @@
     url: "{{ alertmanager_url }}"
     dest: "{{ alertmanager_releases_path }}"
     validate_certs: "{{ alertmanager_ssl_verify }}"
-  when: alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
+  when: alertmanager_check is failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
 
 - name: Extract alertmanager package
   unarchive:
     copy: no
     src: "{{ alertmanager_releases_path }}/{{ alertmanager_package }}"
     dest: /tmp
-  when: alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
+  when: alertmanager_check is failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
 
 - name: Copy alertmanager binary
   copy:
@@ -27,7 +27,7 @@
     group: "{{ alertmanager_group }}"
     remote_src: yes
     mode: 0755
-  when: alertmanager_check|failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
+  when: alertmanager_check is failed or ( alertmanager_version not in alertmanager_check.stderr ) or alertmanager_force_deploy
   notify: restart alertmanager
 
 - name: Link alertmanager binary

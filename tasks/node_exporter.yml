@@ -10,14 +10,14 @@
     url: "{{ node_exporter_url }}"
     dest: "{{ node_exporter_releases_path }}"
     validate_certs: "{{ node_exporter_ssl_verify }}"
-  when: node_exporter_check|failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
+  when: node_exporter_check is faileded or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
 
 - name: Extract node exporter package
   unarchive:
     copy: no
     src: "{{ node_exporter_releases_path }}/{{ node_exporter_package }}"
     dest: /tmp
-  when: node_exporter_check|failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
+  when: node_exporter_check is faileded or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
 
 - name: Copy node exporter binary
   copy:
@@ -27,7 +27,7 @@
     group: "{{ node_exporter_group }}"
     remote_src: yes
     mode: 0755
-  when: node_exporter_check|failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
+  when: node_exporter_check is faileded or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
   notify: restart node exporter
 
 - name: Link node exporter binary

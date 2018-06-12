@@ -12,14 +12,14 @@
     url: "{{ prometheus_url }}"
     dest: "{{ prometheus_releases_path }}"
     validate_certs: "{{ prometheus_ssl_verify }}"
-  when: prometheus_check|failed or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy
+  when: prometheus_check is faileded or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy
 
 - name: Unarchive prometheus package
   unarchive:
     copy: no
     src: "{{ prometheus_releases_path }}/{{ prometheus_package }}"
     dest: /tmp
-  when: prometheus_check|failed or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy
+  when: prometheus_check is faileded or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy
 
 - name: Copy prometheus binary
   copy:
@@ -33,7 +33,7 @@
     - prometheus
     - promtool
   notify: restart prometheus
-  when: prometheus_check|failed or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy
+  when: prometheus_check is faileded or ( prometheus_version not in prometheus_check.stderr ) or prometheus_force_deploy
 
 - name: Link prometheus binary
   file:
