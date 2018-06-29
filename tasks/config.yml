@@ -3,7 +3,7 @@
   - name: Copy prometheus rules
     template:
       src: "{{ item }}"
-      dest: "{{ prometheus_rules_path }}/{{ item | basename}}"
+      dest: "{{ prometheus_rules_path }}/{{ (item | basename | splitext)[0] }}"
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
