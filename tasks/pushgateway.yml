@@ -10,14 +10,14 @@
     url: "{{ pushgateway_url }}"
     dest: "{{ pushgateway_releases_path }}"
     validate_certs: "{{ pushgateway_ssl_verify }}"
-  when: pushgateway_check is faileded or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
+  when: pushgateway_check is failed or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
 
 - name: Extract pushgateway package
   unarchive:
     copy: no
     src: "{{ pushgateway_releases_path }}/{{ pushgateway_package }}"
     dest: /tmp
-  when: pushgateway_check is faileded or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
+  when: pushgateway_check is failed or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
 
 - name: Copy pushgateway binary
   copy:
@@ -27,7 +27,7 @@
     group: "{{ pushgateway_group }}"
     remote_src: yes
     mode: 0755
-  when: pushgateway_check is faileded or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
+  when: pushgateway_check is failed or ( pushgateway_version not in pushgateway_check.stderr ) or pushgateway_force_deploy
   notify: restart pushgateway
 
 - name: Link pushgateway binary
