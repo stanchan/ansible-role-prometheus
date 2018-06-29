@@ -9,7 +9,7 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.3.0
+prometheus_version: 2.3.1
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}.tar.gz"
@@ -67,7 +67,7 @@ prometheus_options:
   - "web.enable-lifecycle"
   - "config.file={{ prometheus_conf_path }}/prometheus.yml"
 
-alertmanager_version: 0.15.0-rc.2
+alertmanager_version: 0.15.0
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
 alertmanager_package: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}.tar.gz"
@@ -121,7 +121,7 @@ alertmanager_hipchat_auth_token: ""
 alertmanager_smtp_receivers: []
 alertmanager_pagerduty_receivers: []
 
-pushgateway_version: 0.5.1
+pushgateway_version: 0.5.2
 pushgateway_release_system: linux-amd64
 pushgateway_release_name: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}"
 pushgateway_package: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}.tar.gz"
