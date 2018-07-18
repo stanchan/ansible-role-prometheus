@@ -3,6 +3,7 @@ required_packages: []
 systemd_service_dir: /lib/systemd/system
 is_service: no
 is_systemd: no
+enable_config: yes
 
 gosu_version: "1.10"
 gosu_release_system: amd64
