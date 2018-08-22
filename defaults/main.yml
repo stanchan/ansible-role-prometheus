@@ -68,7 +68,7 @@ prometheus_options:
   - "web.enable-lifecycle"
   - "config.file={{ prometheus_conf_path }}/prometheus.yml"
 
-alertmanager_version: 0.15.1
+alertmanager_version: 0.15.2
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
 alertmanager_package: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}.tar.gz"
