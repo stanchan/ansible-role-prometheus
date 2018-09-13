@@ -18,8 +18,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart prometheus
+      notify:
+        - restart prometheus
 
     - name: Enable prometheus service
       service:
@@ -36,8 +36,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart prometheus
+      notify:
+        - restart prometheus
 
     - name: Enable prometheus systemd service
       systemd:
@@ -57,8 +57,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart alertmanager
+      notify:
+        - restart alertmanager
 
     - name: Enable alertmanager service
       service:
@@ -75,8 +75,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart alertmanager
+      notify:
+        - restart alertmanager
 
     - name: Enable alertmanager systemd service
       systemd:
@@ -96,8 +96,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart pushgateway
+      notify:
+        - restart pushgateway
 
     - name: Enable pushgateway service
       service:
@@ -114,8 +114,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart pushgateway
+      notify:
+        - restart pushgateway
 
     - name: Enable pushgateway systemd service
       systemd:
@@ -135,8 +135,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart node_exporter
+      notify:
+        - restart node_exporter
 
     - name: Enable node_exporter service
       service:
@@ -153,8 +153,8 @@
         owner: root
         group: root
         mode: 0755
-    notify:
-      - restart node_exporter
+      notify:
+        - restart node_exporter
 
     - name: Enable node_exporter systemd service
       systemd:
