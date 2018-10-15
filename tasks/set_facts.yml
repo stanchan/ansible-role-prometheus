@@ -18,3 +18,7 @@
 - name: Set is_blackbox_exporter if in blackbox_exporter group
   set_fact:
     is_blackbox_exporter: "{{ inventory_hostname in groups['blackbox_exporter'] | default([]) }}"
+
+- name: Set is_solr_exporter if in solr_exporter group
+  set_fact:
+    is_solr_exporter: "{{ inventory_hostname in groups['solr_exporter'] | default([]) }}"
