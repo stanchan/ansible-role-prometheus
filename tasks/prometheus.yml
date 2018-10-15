@@ -29,7 +29,7 @@
     group: "{{ prometheus_group }}"
     remote_src: yes
     mode: 0755
-  with_items:
+  loop:
     - prometheus
     - promtool
   notify: restart prometheus
@@ -40,6 +40,6 @@
     src: "{{ prometheus_bin_path }}/{{ item }}"
     dest: "/usr/bin/{{ item }}"
     state: link
-  with_items:
+  loop:
     - prometheus
     - promtool

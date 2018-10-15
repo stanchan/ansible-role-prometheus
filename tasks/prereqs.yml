@@ -3,4 +3,4 @@
   package:
     name: "{{ item }}"
     state: present
-  with_items: "{{ required_packages }}"
+  loop: "{{ required_packages }}"

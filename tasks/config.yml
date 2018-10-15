@@ -34,7 +34,7 @@
     file:
       path: "{{ prometheus_rules_path }}/{{ item }}"
       state: absent
-    with_items:
+    loop:
       - "{{ check_rules.files | map(attribute='path') | map('basename') | list | difference(prometheus_rules_templates) }}"
 
   - name: Copy prometheus common scrape templates
@@ -44,7 +44,7 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    with_items: "{{ prometheus_template_common_configs }}"
+    loop: "{{ prometheus_template_common_configs }}"
 
   - name: Load prometheus scrape vars
     include_vars:
@@ -103,7 +103,7 @@
     file:
       path: "{{ prometheus_snippets_path }}/{{ item }}"
       state: absent
-    with_items:
+    loop:
       - "{{ check_config_scrapes_existing.files | map(attribute='path') |  map('basename') | map('splitext') | map('first') | list | difference(prometheus_config_scrapes_load_list) }}"
 
   - name: Join prometheus config snippets
@@ -135,7 +135,7 @@
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640
-    with_items: "{{ alertmanager_template_common_configs }}"
+    loop: "{{ alertmanager_template_common_configs }}"
 
   - name: Copy alertmanager config files
     copy:
@@ -170,7 +170,7 @@
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640
-    with_items:
+    loop:
       - 2_alertmanager_routes
       - 3_alertmanager_inhibit_rules
     when:
@@ -206,7 +206,7 @@
     file:
       path: "{{ alertmanager_snippets_path }}/{{ item }}"
       state: absent
-    with_items:
+    loop:
       - "{{ check_snippets_existing.files | map(attribute='path') |  map('basename') | map('splitext') | map('first') | list | difference(alertmanager_config_load_list) }}"
 
   - name: Join alertmanager config snippets

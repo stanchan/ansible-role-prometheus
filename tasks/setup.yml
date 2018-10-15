@@ -22,7 +22,7 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       state: directory
-    with_items:
+    loop:
       - "{{ prometheus_root_path }}"
       - "{{ prometheus_bin_path }}"
       - "{{ prometheus_releases_path }}"
@@ -55,7 +55,7 @@
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       state: directory
-    with_items:
+    loop:
       - "{{ alertmanager_root_path }}"
       - "{{ alertmanager_bin_path }}"
       - "{{ alertmanager_releases_path }}"
@@ -87,7 +87,7 @@
       owner: "{{ pushgateway_user }}"
       group: "{{ pushgateway_group }}"
       state: directory
-    with_items:
+    loop:
       - "{{ pushgateway_root_path }}"
       - "{{ pushgateway_bin_path }}"
       - "{{ pushgateway_releases_path }}"
@@ -117,7 +117,7 @@
       owner: "{{ node_exporter_user }}"
       group: "{{ node_exporter_group }}"
       state: directory
-    with_items:
+    loop:
       - "{{ node_exporter_root_path }}"
       - "{{ node_exporter_bin_path }}"
       - "{{ node_exporter_releases_path }}"
@@ -148,7 +148,7 @@
       owner: "{{ blackbox_exporter_user }}"
       group: "{{ blackbox_exporter_group }}"
       state: directory
-    with_items:
+    loop:
       - "{{ blackbox_exporter_root_path }}"
       - "{{ blackbox_exporter_bin_path }}"
       - "{{ blackbox_exporter_releases_path }}"
@@ -178,9 +178,9 @@
       owner: "{{ solr_exporter_user }}"
       group: "{{ solr_exporter_group }}"
       state: directory
-  loop:
-    - "{{ solr_exporter_home }}"
-    - "{{ solr_exporter_release_root }}"
-    - "{{ solr_exporter_bin_path }}"
-    - "{{ solr_exporter_log_file | dirname }}"
+    loop:
+      - "{{ solr_exporter_home }}"
+      - "{{ solr_exporter_release_root }}"
+      - "{{ solr_exporter_bin_path }}"
+      - "{{ solr_exporter_log_file | dirname }}"
   when: is_solr_exporter
