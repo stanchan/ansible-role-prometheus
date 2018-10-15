@@ -1,25 +1,25 @@
 ---
-- name: Check node exporter version
+- name: Check node_exporter version
   command: "{{ node_exporter_bin_path }}/node_exporter --version"
   register: node_exporter_check
   changed_when: no
   ignore_errors: yes
 
-- name: Download node exporter package
+- name: Download node_exporter package
   get_url:
     url: "{{ node_exporter_url }}"
     dest: "{{ node_exporter_releases_path }}"
     validate_certs: "{{ node_exporter_ssl_verify }}"
   when: node_exporter_check is failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
 
-- name: Extract node exporter package
+- name: Extract node_exporter package
   unarchive:
     copy: no
     src: "{{ node_exporter_releases_path }}/{{ node_exporter_package }}"
     dest: /tmp
   when: node_exporter_check is failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
 
-- name: Copy node exporter binary
+- name: Copy node_exporter binary
   copy:
     src: "/tmp/{{ node_exporter_release_name }}/node_exporter"
     dest: "{{ node_exporter_bin_path }}/node_exporter"
@@ -28,9 +28,9 @@
     remote_src: yes
     mode: 0755
   when: node_exporter_check is failed or ( node_exporter_version not in node_exporter_check.stderr ) or node_exporter_force_deploy
-  notify: restart node exporter
+  notify: restart node_exporter
 
-- name: Link node exporter binary
+- name: Link node_exporter binary
   file:
     src: "{{ node_exporter_bin_path }}/node_exporter"
     dest: "/usr/bin/node_exporter"

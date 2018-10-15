@@ -10,10 +10,10 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.3.2
+prometheus_version: 2.4.3
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
-prometheus_package: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}.tar.gz"
+prometheus_package: "{{ prometheus_release_name }}.tar.gz"
 prometheus_url: "https://github.com/prometheus/prometheus/releases/download/v{{ prometheus_version }}/{{ prometheus_package }}"
 prometheus_force_deploy: no
 prometheus_ssl_verify: yes
@@ -26,7 +26,8 @@ prometheus_user: prometheus
 prometheus_group: prometheus
 
 prometheus_root_path: /opt/prometheus
-prometheus_conf_path: "/etc/prometheus"
+prometheus_conf_path: /etc/prometheus
+prometheus_conf_file: "{{ prometheus_conf_path }}/prometheus.yml"
 prometheus_bin_path: "{{ prometheus_root_path }}/bin"
 prometheus_releases_path: "{{ prometheus_root_path }}/releases"
 prometheus_rules_path: "{{ prometheus_conf_path }}/rules"
@@ -61,17 +62,17 @@ prometheus_alertmanager_port: 9093
 prometheus_remote_shutdown_enabled: 'false'
 
 prometheus_options:
+  - "config.file={{ prometheus_conf_file }}"
   - "storage.tsdb.retention={{ prometheus_storage_retention }}"
   - "storage.tsdb.path={{ prometheus_data_path }}"
   - "web.external-url=http://{{ prometheus_external_hostname }}:{{ prometheus_port }}/"
   - "web.enable-admin-api"
   - "web.enable-lifecycle"
-  - "config.file={{ prometheus_conf_path }}/prometheus.yml"
 
 alertmanager_version: 0.15.2
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
-alertmanager_package: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}.tar.gz"
+alertmanager_package: "{{ alertmanager_release_name }}.tar.gz"
 alertmanager_url: "https://github.com/prometheus/alertmanager/releases/download/v{{ alertmanager_version }}/{{ alertmanager_package }}"
 alertmanager_force_deploy: no
 alertmanager_ssl_verify: yes
@@ -84,9 +85,10 @@ alertmanager_user: "{{ prometheus_user }}"
 alertmanager_group: "{{ prometheus_group }}"
 
 alertmanager_root_path: /opt/alertmanager
+alertmanager_conf_path: /etc/alertmanager
+alertmanager_conf_file: "{{ alertmanager_conf_path }}/alertmanager.yml"
 alertmanager_bin_path: "{{ alertmanager_root_path }}/bin"
 alertmanager_releases_path: "{{ alertmanager_root_path }}/releases"
-alertmanager_conf_path: "/etc/alertmanager"
 alertmanager_conf_templates_path: "{{ alertmanager_conf_path }}/conf.d"
 alertmanager_snippets_path: "{{ alertmanager_conf_path }}/snippets"
 alertmanager_data_path: "{{ alertmanager_root_path }}/data"
@@ -100,7 +102,7 @@ alertmanager_config_snippets_templates_path: "{{ playbook_dir }}/templates/alert
 alertmanager_config_templates_path: "{{ playbook_dir }}/files/alertmanager/templates"
 
 alertmanager_service_options:
-  - "config.file={{ alertmanager_conf_path }}/alertmanager.yml"
+  - "config.file={{ alertmanager_conf_file }}"
   - "storage.path={{ alertmanager_data_path }}"
   - "web.listen-address=:{{ alertmanager_port }}"
   - "web.external-url=http://{{ alertmanager_external_hostname }}:{{ alertmanager_port }}/"
@@ -125,7 +127,7 @@ alertmanager_pagerduty_receivers: []
 pushgateway_version: 0.5.2
 pushgateway_release_system: linux-amd64
 pushgateway_release_name: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}"
-pushgateway_package: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}.tar.gz"
+pushgateway_package: "{{ pushgateway_release_name }}.tar.gz"
 pushgateway_url: "https://github.com/prometheus/pushgateway/releases/download/v{{ pushgateway_version }}/{{ pushgateway_package }}"
 pushgateway_force_deploy: no
 pushgateway_ssl_verify: yes
@@ -138,9 +140,9 @@ pushgateway_user: "{{ prometheus_user }}"
 pushgateway_group: "{{ prometheus_group }}"
 
 pushgateway_root_path: /opt/pushgateway
+pushgateway_conf_path: "/etc/pushgateway"
 pushgateway_bin_path: "{{ pushgateway_root_path }}/bin"
 pushgateway_releases_path: "{{ pushgateway_root_path }}/releases"
-pushgateway_conf_path: "/etc/pushgateway"
 pushgateway_log_file: "/var/log/pushgateway/pushgateway.log"
 
 pushgateway_service_options:
@@ -149,7 +151,7 @@ pushgateway_service_options:
 node_exporter_version: 0.16.0
 node_exporter_release_system: linux-amd64
 node_exporter_release_name: "node_exporter-{{ node_exporter_version }}.{{ node_exporter_release_system }}"
-node_exporter_package: "node_exporter-{{ node_exporter_version }}.{{ node_exporter_release_system }}.tar.gz"
+node_exporter_package: "{{ node_exporter_release_name }}.tar.gz"
 node_exporter_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ node_exporter_version }}/{{ node_exporter_package }}"
 node_exporter_force_deploy: no
 node_exporter_ssl_verify: yes
@@ -158,16 +160,68 @@ node_exporter_service_name: node_exporter
 node_exporter_external_hostname: "{{ ansible_fqdn }}"
 node_exporter_port: 9100
 
-node_exporter_user: "{{ prometheus_user }}"
-node_exporter_group: "{{ prometheus_group }}"
+node_exporter_user: root
+node_exporter_group: root
 
 node_exporter_root_path: /opt/node_exporter
+node_exporter_conf_path: "/etc/node_exporter"
 node_exporter_bin_path: "{{ node_exporter_root_path }}/bin"
 node_exporter_releases_path: "{{ node_exporter_root_path }}/releases"
-node_exporter_conf_path: "/etc/node_exporter"
 node_exporter_textfile_path: "/var/lib/node_exporter/textfile_collector"
 node_exporter_log_file: "/var/log/node_exporter/node_exporter.log"
 
 node_exporter_service_options:
   - "web.listen-address=:{{ node_exporter_port }}"
   - "collector.textfile.directory={{ node_exporter_textfile_path }}"
+
+blackbox_exporter_version: 0.12.0
+blackbox_exporter_release_system: linux-amd64
+blackbox_exporter_release_name: "blackbox_exporter-{{ blackbox_exporter_version }}.{{ blackbox_exporter_release_system }}"
+blackbox_exporter_package: "{{ blackbox_exporter_release_name }}.tar.gz"
+blackbox_exporter_url: "https://github.com/prometheus/blackbox_exporter/releases/download/v{{ blackbox_exporter_version }}/{{ blackbox_exporter_package }}"
+blackbox_exporter_force_deploy: no
+blackbox_exporter_ssl_verify: yes
+
+blackbox_exporter_service_name: blackbox_exporter
+blackbox_exporter_external_hostname: "{{ ansible_fqdn }}"
+blackbox_exporter_port: 9115
+
+blackbox_exporter_user: root
+blackbox_exporter_group: root
+
+blackbox_exporter_root_path: /opt/blackbox_exporter
+blackbox_exporter_conf_path: "/etc/blackbox_exporter"
+blackbox_exporter_conf_file: "{{ blackbox_exporter_conf_path }}/blackbox_exporter.yml"
+blackbox_exporter_bin_path: "{{ blackbox_exporter_root_path }}/bin"
+blackbox_exporter_releases_path: "{{ blackbox_exporter_root_path }}/releases"
+blackbox_exporter_log_file: "/var/log/blackbox_exporter/blackbox_exporter.log"
+
+blackbox_exporter_service_options:
+  - "config.file={{ blackbox_exporter_conf_file }}"
+
+solr_exporter_version: 0.0.12
+solr_exporter_release_system: linux-amd64
+solr_exporter_release_name: "prometheus-solr-exporter-{{ solr_exporter_version }}.{{ solr_exporter_release_system }}"
+solr_exporter_package: "{{ solr_exporter_release_name }}.tar.gz"
+solr_exporter_url: "https://github.com/stanchan/prometheus-solr-exporter/releases/download/v{{ solr_exporter_version }}/{{ solr_exporter_package }}"
+solr_exporter_force_deploy: no
+solr_exporter_ssl_verify: yes
+
+solr_exporter_service_name: solr_exporter
+solr_exporter_external_hostname: "{{ ansible_nodename }}"
+solr_exporter_port: 9231
+
+solr_exporter_user: root
+solr_exporter_group: root
+
+solr_exporter_home: /opt/solr_exporter
+solr_exporter_bin_path: "{{ solr_exporter_home }}/bin"
+solr_exporter_bin: "solr_exporter-{{ solr_exporter_version }}"
+solr_exporter_release_root: "{{ solr_exporter_home }}/releases"
+solr_exporter_log_file: /var/log/solr_exporter/solr_exporter.log
+
+solr_exporter_service_options:
+  - "solr.address=http://localhost:{{ solr_port }}"
+  - "solr.context-path=/solr"
+  - "solr.pid-file={{ solr_pid_file }}"
+  - "solr.timeout=5s"

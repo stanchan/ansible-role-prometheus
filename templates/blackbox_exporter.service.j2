@@ -1,0 +1,18 @@
+[Unit]
+Description=Prometheus node exporter service
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ blackbox_exporter_user }}
+Group={{ blackbox_exporter_group }}
+Restart=on-failure
+ExecStart=/bin/sh -c "{{ blackbox_exporter_bin_path }}/blackbox_exporter {% for option in blackbox_exporter_service_options %}--{{ option }} {% endfor %}> {{ blackbox_exporter_log_file }} 2>&1"
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+LimitNOFILE=10000
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

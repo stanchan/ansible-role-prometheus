@@ -1,0 +1,18 @@
+[Unit]
+Description=Prometheus solr exporter service
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ solr_exporter_user }}
+Group={{ solr_exporter_group }}
+Restart=on-failure
+ExecStart=/bin/sh -c "{{ solr_exporter_bin_path }}/solr_exporter {% for option in solr_exporter_service_options %}--{{ option }} {% endfor %}> {{ solr_exporter_log_file }} 2>&1"
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+LimitNOFILE=10000
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

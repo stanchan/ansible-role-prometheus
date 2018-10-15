@@ -110,7 +110,7 @@
     assemble:
       remote_src: true
       src: "{{ prometheus_snippets_path }}"
-      dest: "{{ prometheus_conf_path }}/prometheus.yml"
+      dest: "{{ prometheus_conf_file }}"
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
@@ -213,7 +213,7 @@
     assemble:
       remote_src: true
       src: "{{ alertmanager_snippets_path }}"
-      dest: "{{ alertmanager_conf_path }}/alertmanager.yml"
+      dest: "{{ alertmanager_conf_file }}"
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640

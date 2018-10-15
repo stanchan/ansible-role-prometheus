@@ -1,50 +1,43 @@
 ---
 - name: Set facts
   include_tasks: set_facts.yml
-  tags:
-    - all
 
 - name: Setup prereqs
   include_tasks: prereqs.yml
-  tags:
-    - install
+
+- name: Setup prereqs
+  include_tasks: setup.yml
 
 - name: Install gosu
   include_tasks: gosu.yml
-  tags:
-    - install
 
 - name: Install prometheus
   include_tasks: prometheus.yml
   when: is_prometheus
-  tags:
-    - install
 
 - name: Install alertmanager
   include_tasks: alertmanager.yml
   when: is_alertmanager
-  tags:
-    - install
 
 - name: Install pushgateway
   include_tasks: pushgateway.yml
   when: is_pushgateway
-  tags:
-    - install
 
-- name: Install node exporter
+- name: Install node_exporter
   include_tasks: node_exporter.yml
   when: is_node_exporter
-  tags:
-    - install
+
+- name: Install blackbox_exporter
+  include_tasks: blackbox_exporter.yml
+  when: is_blackbox_exporter
+
+- name: Install solr_exporter
+  include_tasks: solr_exporter.yml
+  when: is_solr_exporter
 
 - name: Setup configs
   include_tasks: config.yml
   when: enable_config
-  tags:
-    - config
 
 - name: Setup services
   include_tasks: service.yml
-  tags:
-    - config

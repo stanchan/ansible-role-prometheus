@@ -6,7 +6,7 @@
 
 - name: reload prometheus
   uri:
-    url: http://localhost:9090/-/reload
+    url: "http://localhost:{{ prometheus_port }}/-/reload"
     method: "POST"
 
 - name: restart alertmanager
@@ -19,7 +19,22 @@
     name: pushgateway
     state: restarted
 
-- name: restart node exporter
+- name: restart node_exporter
   service:
     name: node_exporter
+    state: restarted
+
+- name: restart blackbox_exporter
+  service:
+    name: blackbox_exporter
+    state: restarted
+
+- name: reload blackbox_exporter
+  uri:
+    url: "http://localhost:{{ blackbox_exporter_port }}/-/reload"
+    method: "POST"
+
+- name: restart solr_exporter
+  service:
+    name: solr_exporter
     state: restarted

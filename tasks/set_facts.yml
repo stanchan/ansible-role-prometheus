@@ -14,3 +14,7 @@
 - name: Set is_node_exporter if in node_exporter group
   set_fact:
     is_node_exporter: "{{ inventory_hostname in groups['node_exporter'] | default([]) }}"
+
+- name: Set is_blackbox_exporter if in blackbox_exporter group
+  set_fact:
+    is_blackbox_exporter: "{{ inventory_hostname in groups['blackbox_exporter'] | default([]) }}"

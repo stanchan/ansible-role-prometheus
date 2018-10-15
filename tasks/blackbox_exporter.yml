@@ -1,0 +1,38 @@
+---
+- name: Check blackbox_exporter version
+  command: "{{ blackbox_exporter_bin_path }}/blackbox_exporter --version"
+  register: blackbox_exporter_check
+  changed_when: no
+  ignore_errors: yes
+
+- name: Download blackbox_exporter package
+  get_url:
+    url: "{{ blackbox_exporter_url }}"
+    dest: "{{ blackbox_exporter_releases_path }}"
+    validate_certs: "{{ blackbox_exporter_ssl_verify }}"
+  when: blackbox_exporter_check is failed or ( blackbox_exporter_version not in blackbox_exporter_check.stderr ) or blackbox_exporter_force_deploy
+
+- name: Extract blackbox_exporter package
+  unarchive:
+    copy: no
+    src: "{{ blackbox_exporter_releases_path }}/{{ blackbox_exporter_package }}"
+    dest: /tmp
+  when: blackbox_exporter_check is failed or ( blackbox_exporter_version not in blackbox_exporter_check.stderr ) or blackbox_exporter_force_deploy
+
+- name: Copy blackbox_exporter binary
+  copy:
+    src: "/tmp/{{ blackbox_exporter_release_name }}/blackbox_exporter"
+    dest: "{{ blackbox_exporter_bin_path }}/blackbox_exporter"
+    owner: "{{ blackbox_exporter_user }}"
+    group: "{{ blackbox_exporter_group }}"
+    remote_src: yes
+    mode: 0755
+  when: blackbox_exporter_check is failed or ( blackbox_exporter_version not in blackbox_exporter_check.stderr ) or blackbox_exporter_force_deploy
+  notify: restart blackbox_exporter
+
+- name: Link blackbox_exporter binary
+  file:
+    src: "{{ blackbox_exporter_bin_path }}/blackbox_exporter"
+    dest: "/usr/bin/blackbox_exporter"
+    state: link
+  ignore_errors: yes
