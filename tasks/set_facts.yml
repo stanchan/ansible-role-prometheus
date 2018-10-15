@@ -1,24 +1,9 @@
 ---
-- name: Set is_prometheus if in prometheus group
+- name: Set prometheus roles
   set_fact:
     is_prometheus: "{{ inventory_hostname in groups['prometheus'] | default([]) }}"
-
-- name: Set is_alertmanager if in alertmanager group
-  set_fact:
     is_alertmanager: "{{ inventory_hostname in groups['alertmanager'] | default([]) }}"
-
-- name: Set is_pushgateway if in pushgateway group
-  set_fact:
     is_pushgateway: "{{ inventory_hostname in groups['pushgateway'] | default([]) }}"
-
-- name: Set is_node_exporter if in node_exporter group
-  set_fact:
     is_node_exporter: "{{ inventory_hostname in groups['node_exporter'] | default([]) }}"
-
-- name: Set is_blackbox_exporter if in blackbox_exporter group
-  set_fact:
     is_blackbox_exporter: "{{ inventory_hostname in groups['blackbox_exporter'] | default([]) }}"
-
-- name: Set is_solr_exporter if in solr_exporter group
-  set_fact:
     is_solr_exporter: "{{ inventory_hostname in groups['solr_exporter'] | default([]) }}"
