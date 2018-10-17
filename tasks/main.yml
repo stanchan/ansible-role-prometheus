@@ -2,10 +2,10 @@
 - name: Set facts
   include_tasks: set_facts.yml
 
-- name: Setup prereqs
+- name: Run prereqs
   include_tasks: prereqs.yml
 
-- name: Setup prereqs
+- name: Run setup
   include_tasks: setup.yml
 
 - name: Install gosu

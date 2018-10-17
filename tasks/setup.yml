@@ -5,6 +5,7 @@
       name: "{{ prometheus_group }}"
       system: yes
       state: present
+    when: prometheus_group != "root"
 
   - name: Create prometheus user
     user:
@@ -15,6 +16,7 @@
       shell: /sbin/nologin
       createhome: no
       system: yes
+    when: prometheus_user != "root"
 
   - name: Check filesystem paths
     file:
@@ -48,6 +50,7 @@
       shell: /sbin/nologin
       createhome: no
       system: yes
+    when: alertmanager_user != "root"
 
   - name: Ensure alertmanager paths
     file:
@@ -71,6 +74,7 @@
       name: "{{ pushgateway_group }}"
       system: yes
       state: present
+    when: pushgateway_group != "root"
 
   - name: Ensure pushgateway user
     user:
@@ -80,6 +84,7 @@
       shell: /sbin/nologin
       createhome: no
       system: yes
+    when: pushgateway_user != "root"
 
   - name: Ensure pushgateway paths
     file:
@@ -101,6 +106,7 @@
       name: "{{ node_exporter_group }}"
       system: yes
       state: present
+    when: node_exporter_group != "root"
 
   - name: Ensure node_exporter user
     user:
@@ -110,6 +116,7 @@
       shell: /sbin/nologin
       createhome: no
       system: yes
+    when: node_exporter_user != "root"
 
   - name: Ensure node_exporter paths
     file:
@@ -132,6 +139,7 @@
       name: "{{ blackbox_exporter_group }}"
       system: yes
       state: present
+    when: blackbox_exporter_group != "root"
 
   - name: Ensure blackbox_exporter user
     user:
@@ -141,6 +149,7 @@
       shell: /sbin/nologin
       createhome: no
       system: yes
+    when: blackbox_exporter_user != "root"
 
   - name: Ensure blackbox_exporter paths
     file:
@@ -162,6 +171,7 @@
       name: "{{ solr_exporter_group }}"
       system: yes
       state: present
+    when: solr_exporter_group != "root"
 
   - name: Ensure solr_exporter user
     user:
@@ -171,6 +181,7 @@
       shell: /sbin/nologin
       createhome: no
       system: yes
+    when: solr_exporter_user != "root"
 
   - name: Ensure solr_exporter paths
     file:
