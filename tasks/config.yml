@@ -7,8 +7,7 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    with_fileglob:
-      - "{{ prometheus_config_rules_templates_path }}/*"
+    loop: "{{ query('fileglob', prometheus_config_rules_templates_path + '/*') }}"
     notify:
       - reload prometheus
 
@@ -50,8 +49,7 @@
     include_vars:
       file: "{{ item }}"
       name: "{{ item | basename | splitext | first }}"
-    with_fileglob:
-      - "{{ prometheus_config_vars_templates_path }}/*"
+    loop: "{{ query('fileglob', prometheus_config_vars_templates_path + '/*') }}"
 
   - name: Copy prometheus scrape files
     copy:
@@ -60,8 +58,7 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    with_fileglob:
-      - "{{ prometheus_config_scrapes_files_path }}/*"
+    loop: "{{ query('fileglob', prometheus_config_scrapes_files_path + '/*') }}"
 
   - name: Copy prometheus scrape templates
     template:
@@ -70,8 +67,7 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    with_fileglob:
-      - "{{ prometheus_config_scrapes_templates_path }}/*"
+    loop: "{{ query('fileglob', prometheus_config_scrapes_templates_path + '/*') }}"
 
   - name: Set prometheus scrape source files
     find:
@@ -144,8 +140,7 @@
       owner: "{{ prometheus_user }}"
       group: "{{ prometheus_group }}"
       mode: 0640
-    with_fileglob:
-      - "{{ alertmanager_config_snippets_files_path }}/*"
+    loop: "{{ query('fileglob', alertmanager_config_snippets_files_path + '/*') }}"
 
   - name: Copy alertmanager config templates
     copy:
@@ -154,8 +149,7 @@
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640
-    with_fileglob:
-      - "{{ alertmanager_config_snippets_templates_path }}/*"
+    loop: "{{ query('fileglob', alertmanager_config_snippets_templates_path + '/*') }}"
 
   - name: Check current alertmanager snippets
     find:
@@ -228,8 +222,7 @@
       owner: "{{ alertmanager_user }}"
       group: "{{ alertmanager_group }}"
       mode: 0640
-    with_fileglob:
-      - "{{ alertmanager_config_templates_path }}/*"
+    loop: "{{ query('fileglob', alertmanager_config_templates_path + '/*') }}"
     notify:
       - reload alertmanager
 
