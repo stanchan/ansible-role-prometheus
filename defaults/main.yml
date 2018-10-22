@@ -210,7 +210,9 @@ solr_exporter_ssl_verify: yes
 solr_exporter_service_name: solr_exporter
 solr_exporter_external_hostname: "{{ ansible_nodename }}"
 solr_exporter_port: 9231
+
 solr_port: 8983
+solr_pid_file: "/run/solr/solr-{{ solr_port }}.pid"
 
 solr_exporter_user: root
 solr_exporter_group: root
