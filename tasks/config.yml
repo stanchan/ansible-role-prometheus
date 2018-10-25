@@ -234,3 +234,13 @@
       owner: root
       group: root
   when: is_alertmanager
+
+- block:
+  - name: Copy blackbox_exporter config template
+    template:
+      src: "blackbox_exporter/blackbox.yml.j2"
+      dest: "{{ blackbox_exporter_conf_file }}"
+      owner: "{{ blackbox_exporter_user }}"
+      group: "{{ blackbox_exporter_group }}"
+      mode: 0640
+  when: is_blackbox_exporter

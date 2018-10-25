@@ -1,6 +1,5 @@
 ---
 - name: Install dependent packages
   package:
-    name: "{{ item }}"
+    name: "{{ required_packages }}"
     state: present
-  loop: "{{ required_packages }}"

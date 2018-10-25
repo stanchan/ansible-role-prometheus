@@ -121,8 +121,7 @@ alertmanager_opsgenie_api_host: ""
 alertmanager_hipchat_url: ""
 alertmanager_hipchat_auth_token: ""
 
-alertmanager_smtp_receivers: []
-alertmanager_pagerduty_receivers: []
+alertmanager_receivers: []
 
 pushgateway_version: 0.5.2
 pushgateway_release_system: linux-amd64
@@ -191,7 +190,7 @@ blackbox_exporter_group: root
 
 blackbox_exporter_root_path: /opt/blackbox_exporter
 blackbox_exporter_conf_path: "/etc/blackbox_exporter"
-blackbox_exporter_conf_file: "{{ blackbox_exporter_conf_path }}/blackbox_exporter.yml"
+blackbox_exporter_conf_file: "{{ blackbox_exporter_conf_path }}/blackbox.yml"
 blackbox_exporter_bin_path: "{{ blackbox_exporter_root_path }}/bin"
 blackbox_exporter_releases_path: "{{ blackbox_exporter_root_path }}/releases"
 blackbox_exporter_log_file: "/var/log/blackbox_exporter/blackbox_exporter.log"

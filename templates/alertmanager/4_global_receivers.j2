@@ -1,4 +1,4 @@
-receivers:
+receivers:{% if alertmanager_receivers %}
 {% for receiver in alertmanager_receivers %}
 - name: '{{ receiver.name }}'
 {% if "smtp_groups" in receiver %}
@@ -22,3 +22,4 @@ receivers:
 {% endif %}
 
 {% endfor %}
+{% else %}[]{% endif %}
