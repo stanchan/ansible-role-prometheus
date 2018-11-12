@@ -1,0 +1,38 @@
+scrape_configs:
+{% for type in prometheus_scrape|map(attribute='type')|unique|list %}
+{% for role in prometheus_scrape|selectattr('type', 'equalto', type)|map(attribute='role')|unique|list %}
+  - job_name: '{{ role }}'
+    static_configs:
+{% for env in prometheus_scrape|selectattr('type', 'equalto', type)|selectattr('role', 'equalto', role)|map(attribute='env')|unique|list %}
+      - targets:
+{% for target in prometheus_scrape|selectattr('type', 'equalto', type)|selectattr('role', 'equalto', role)|selectattr('env', 'equalto', env)|map(attribute='nodes')|first %}          - '{{ target }}'
+{% endfor %}
+        labels:
+          environment: {{ env }}
+
+{% endfor %}
+{% set metric_relabel_role = lookup('vars', type|replace('-', '_') + '_metric_relabel_configs', default='') %}
+{% if metric_relabel_role %}
+    metric_relabel_configs:
+{% for config in metric_relabel_role %}
+{% for k, v in config.items() %}{% if loop.index0 == 0 %}      - {{ k }}: {{ v }}
+{% else %}        {{ k }}: {{ v }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{% endif %}
+{% set relabel_role = lookup('vars', type|replace('-', '_') + '_relabel_configs', default='') %}
+{% if relabel_role %}
+    relabel_configs:
+{% for config in relabel_role %}
+{% for k, v in config.items() %}{% if loop.index0 == 0 %}      - {{ k }}: {{ v }}
+{% else %}        {{ k }}: {{ v }}
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{% endif %}
+
+{% endfor %}
+{% endfor %}

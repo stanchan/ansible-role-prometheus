@@ -10,7 +10,7 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.4.3
+prometheus_version: 2.5.0
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "{{ prometheus_release_name }}.tar.gz"
@@ -36,6 +36,7 @@ prometheus_data_path: "{{ prometheus_root_path }}/data"
 prometheus_log_file: "/var/log/prometheus/prometheus.log"
 prometheus_template_common_configs:
   - "1_global_prometheus"
+  - "2_prometheus_scrapes"
 
 prometheus_config_scrapes_files_path: "{{ playbook_dir }}/files/prometheus/config/scrapes"
 prometheus_config_scrapes_templates_path: "{{ playbook_dir }}/templates/prometheus/config/scrapes"
@@ -68,6 +69,38 @@ prometheus_options:
   - "web.external-url=http://{{ prometheus_external_hostname }}:{{ prometheus_port }}/"
   - "web.enable-admin-api"
   - "web.enable-lifecycle"
+
+prometheus_statistics_relabel_configs:
+  - source_labels: '[__address__]'
+    regex: '(.+):(.*)$'
+    target_label: instance
+    replacement: ${1}
+
+prometheus_scrape:
+  - nodes: "{{ groups['prometheus'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(prometheus_port)) | list }}"
+    env: devtest
+    role: 'prometheus_statistics'
+    type: 'prometheus'
+  - nodes: "{{ groups['alertmanager'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(prometheus_alertmanager_port)) | list }}"
+    env: devtest
+    role: 'alertmanager'
+    type: 'alertmanager'
+  - nodes: "{{ groups['grafana'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(grafana_port)) | list }}"
+    env: devtest
+    role: 'grafana'
+    type: 'grafana'
+  - nodes: [ "{{ pushgateway_external_hostname }}:{{ pushgateway_port }}" ]
+    env: devtest
+    role: "pushgateway_{{ pushgateway_external_hostname.split('.')[0] }}"
+    type: 'pushgateway'
+  - nodes: "{{ groups['node_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(node_exporter_port)) | list }}"
+    env: devtest
+    role: 'node'
+    type: 'node-exporter'
+  - nodes: "{{ groups['solr_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(solr_exporter_port)) | list }}"
+    env: devtest
+    role: 'solr'
+    type: 'solr-exporter'
 
 alertmanager_version: 0.15.2
 alertmanager_release_system: linux-amd64
@@ -121,7 +154,17 @@ alertmanager_opsgenie_api_host: ""
 alertmanager_hipchat_url: ""
 alertmanager_hipchat_auth_token: ""
 
-alertmanager_receivers: []
+alertmanager_receivers:
+  - name: 'default-receiver'
+    config:
+      webhook_configs:
+        - url: 'http://127.0.0.1:5001/'
+
+alertmanager_relabel_configs:
+  - source_labels: '[__address__]'
+    regex: '(.+):(.*)$'
+    target_label: instance
+    replacement: ${1}
 
 pushgateway_version: 0.5.2
 pushgateway_release_system: linux-amd64
@@ -146,6 +189,12 @@ pushgateway_log_file: "/var/log/pushgateway/pushgateway.log"
 
 pushgateway_service_options:
   - "web.listen-address=:{{ pushgateway_port }}"
+
+pushgateway_relabel_configs:
+  - source_labels: '[__address__]'
+    regex: '(.+):(.*)$'
+    target_label: instance
+    replacement: ${1}
 
 node_exporter_version: 0.16.0
 node_exporter_release_system: linux-amd64
@@ -173,6 +222,12 @@ node_exporter_service_options:
   - "web.listen-address=:{{ node_exporter_port }}"
   - "collector.textfile.directory={{ node_exporter_textfile_path }}"
 
+node_exporter_relabel_configs:
+  - source_labels: '[__address__]'
+    regex: '(.+):(.*)$'
+    target_label: instance
+    replacement: ${1}
+
 blackbox_exporter_version: 0.12.0
 blackbox_exporter_release_system: linux-amd64
 blackbox_exporter_release_name: "blackbox_exporter-{{ blackbox_exporter_version }}.{{ blackbox_exporter_release_system }}"
@@ -198,7 +253,13 @@ blackbox_exporter_log_file: "/var/log/blackbox_exporter/blackbox_exporter.log"
 blackbox_exporter_service_options:
   - "config.file={{ blackbox_exporter_conf_file }}"
 
-solr_exporter_version: 0.0.12
+blackbox_relabel_configs:
+  - source_labels: '[__address__]'
+    regex: '(.+):(.*)$'
+    target_label: instance
+    replacement: ${1}
+
+solr_exporter_version: 0.0.14
 solr_exporter_release_system: linux-amd64
 solr_exporter_release_name: "prometheus-solr-exporter-{{ solr_exporter_version }}.{{ solr_exporter_release_system }}"
 solr_exporter_package: "{{ solr_exporter_release_name }}.tar.gz"
@@ -227,3 +288,23 @@ solr_exporter_service_options:
   - "solr.context-path=/solr"
   - "solr.pid-file={{ solr_pid_file }}"
   - "solr.timeout=5s"
+
+solr_exporter_relabel_configs:
+  - source_labels: '[__address__]'
+    regex: '(.+):(.*)$'
+    target_label: instance
+    replacement: ${1}
+
+solr_exporter_metric_relabel_configs:
+  - source_labels: "['core']"
+    regex: "'^([^\\W.\\-]+)_shard([0-9_]+)_replica_(n\\d+)'"
+    replacement: "'${1}'"
+    target_label: collection
+  - source_labels: "['core']"
+    regex: "'([^\\W.\\-]+)_shard([0-9_]+)_replica_(n\\d+)'"
+    replacement: "'${2}'"
+    target_label: shard
+  - source_labels: "['core']"
+    regex: "'([^\\W.\\-]+)_shard([0-9_]+)_replica_(n\\d+)'"
+    replacement: "'${3}'"
+    target_label: replica

@@ -14,6 +14,11 @@
     name: alertmanager
     state: restarted
 
+- name: reload alertmanager
+  uri:
+    url: "http://localhost:{{ alertmanager_port }}/-/reload"
+    method: "POST"
+
 - name: restart pushgateway
   service:
     name: pushgateway

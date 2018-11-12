@@ -36,6 +36,9 @@
     loop:
       - "{{ check_rules.files | map(attribute='path') | map('basename') | list | difference(prometheus_rules_templates) }}"
 
+  - debug:
+      var: prometheus_scrape
+
   - name: Copy prometheus common scrape templates
     template:
       src: "prometheus/{{ item }}.j2"
@@ -112,7 +115,7 @@
       mode: 0640
       delimiter: '\n'
     notify:
-      - restart prometheus
+      - reload prometheus
 
   - name: Copy prometheus logrotate config
     template:
@@ -213,7 +216,7 @@
       mode: 0640
       delimiter: '\n'
     notify:
-      - restart alertmanager
+      - reload alertmanager
 
   - name: Copy alertmanager templates
     copy:
