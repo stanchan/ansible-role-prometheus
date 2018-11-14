@@ -36,9 +36,6 @@
     loop:
       - "{{ check_rules.files | map(attribute='path') | map('basename') | list | difference(prometheus_rules_templates) }}"
 
-  - debug:
-      var: prometheus_scrape
-
   - name: Copy prometheus common scrape templates
     template:
       src: "prometheus/{{ item }}.j2"

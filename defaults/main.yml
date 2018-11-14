@@ -77,32 +77,43 @@ prometheus_statistics_relabel_configs:
     replacement: ${1}
 
 prometheus_scrape:
-  - nodes: "{{ groups['prometheus'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(prometheus_port)) | list }}"
-    env: devtest
-    role: 'prometheus_statistics'
+  - role: 'prometheus_statistics'
     type: 'prometheus'
-  - nodes: "{{ groups['alertmanager'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(prometheus_alertmanager_port)) | list }}"
-    env: devtest
-    role: 'alertmanager'
+    configs:
+      - env: 'devtest'
+        nodes: "{{ groups['prometheus'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(prometheus_port)) | list }}"
+  - role: 'alertmanager'
     type: 'alertmanager'
-  - nodes: "{{ groups['grafana'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(grafana_port)) | list }}"
-    env: devtest
-    role: 'grafana'
+    configs:
+      - env: 'devtest'
+        nodes: "{{ groups['alertmanager'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(prometheus_alertmanager_port)) | list }}"
+  - role: 'grafana'
     type: 'grafana'
-  - nodes: [ "{{ pushgateway_external_hostname }}:{{ pushgateway_port }}" ]
-    env: devtest
-    role: "pushgateway_{{ pushgateway_external_hostname.split('.')[0] }}"
+    configs:
+      - env: 'devtest'
+        nodes: "{{ groups['grafana'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(grafana_port)) | list }}"
+  - role: "pushgateway_{{ pushgateway_external_hostname.split('.')[0] }}"
     type: 'pushgateway'
-  - nodes: "{{ groups['node_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(node_exporter_port)) | list }}"
-    env: devtest
-    role: 'node'
+    configs:
+      - env: 'devtest'
+        nodes: [ "{{ pushgateway_external_hostname }}:{{ pushgateway_port }}" ]
+  - role: 'node'
     type: 'node-exporter'
-  - nodes: "{{ groups['solr_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(solr_exporter_port)) | list }}"
-    env: devtest
-    role: 'solr'
+    configs:
+      - env: 'devtest'
+        nodes: "{{ groups['node_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(node_exporter_port)) | list }}"
+  - role: 'solr'
     type: 'solr-exporter'
+    configs:
+      - env: 'devtest'
+        nodes: "{{ groups['solr_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(solr_exporter_port)) | list }}"
+  - role: 'zookeeper'
+    type: 'jmx-exporter'
+    configs:
+      - env: 'devtest'
+        nodes: "{{ groups['jmx_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(zookeeper_jmx_exporter_port)) | list }}"
 
-alertmanager_version: 0.15.2
+alertmanager_version: 0.15.3
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
 alertmanager_package: "{{ alertmanager_release_name }}.tar.gz"

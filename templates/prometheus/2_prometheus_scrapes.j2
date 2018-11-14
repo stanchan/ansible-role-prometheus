@@ -3,13 +3,15 @@ scrape_configs:
 {% for role in prometheus_scrape|selectattr('type', 'equalto', type)|map(attribute='role')|unique|list %}
   - job_name: '{{ role }}'
     static_configs:
-{% for env in prometheus_scrape|selectattr('type', 'equalto', type)|selectattr('role', 'equalto', role)|map(attribute='env')|unique|list %}
+{% for configs in prometheus_scrape|selectattr('type', 'equalto', type)|selectattr('role', 'equalto', role)|map(attribute='configs') %}
       - targets:
-{% for target in prometheus_scrape|selectattr('type', 'equalto', type)|selectattr('role', 'equalto', role)|selectattr('env', 'equalto', env)|map(attribute='nodes')|first %}          - '{{ target }}'
+{% for target in configs %}
+{% for node in target.nodes %}          - '{{ node }}'
 {% endfor %}
         labels:
-          environment: {{ env }}
+          environment: {{ target.env }}
 
+{% endfor %}
 {% endfor %}
 {% set metric_relabel_role = lookup('vars', type|replace('-', '_') + '_metric_relabel_configs', default='') %}
 {% if metric_relabel_role %}
