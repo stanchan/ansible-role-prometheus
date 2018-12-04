@@ -1,9 +1,10 @@
 ---
 - name: Set prometheus roles
   set_fact:
-    is_prometheus: "{{ inventory_hostname in groups['prometheus'] | default([]) }}"
-    is_alertmanager: "{{ inventory_hostname in groups['alertmanager'] | default([]) }}"
-    is_pushgateway: "{{ inventory_hostname in groups['pushgateway'] | default([]) }}"
-    is_node_exporter: "{{ inventory_hostname in groups['node_exporter'] | default([]) }}"
-    is_blackbox_exporter: "{{ inventory_hostname in groups['blackbox_exporter'] | default([]) }}"
-    is_solr_exporter: "{{ inventory_hostname in groups['solr_exporter'] | default([]) }}"
+    is_prometheus: "{{ inventory_hostname in groups['prometheus'] | d([]]) }}"
+    is_alertmanager: "{{ inventory_hostname in groups['alertmanager'] | d([]]) }}"
+    is_pushgateway: "{{ inventory_hostname in groups['pushgateway'] | d([]]) }}"
+    is_node_exporter: "{{ inventory_hostname in groups['node_exporter'] | d([]]) }}"
+    is_blackbox_exporter: "{{ inventory_hostname in groups['blackbox_exporter'] | d([]]) }}"
+    is_solr_exporter: "{{ inventory_hostname in groups['solr_exporter'] | d([]]) }}"
+    cacheable: yes
