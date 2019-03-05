@@ -10,7 +10,7 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.7.0
+prometheus_version: 2.7.2
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "{{ prometheus_release_name }}.tar.gz"
@@ -113,7 +113,7 @@ prometheus_scrape:
       - env: 'devtest'
         nodes: "{{ groups['jmx_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(zookeeper_jmx_exporter_port)) | list }}"
 
-alertmanager_version: 0.16.0
+alertmanager_version: 0.16.1
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
 alertmanager_package: "{{ alertmanager_release_name }}.tar.gz"
