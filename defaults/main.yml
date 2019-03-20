@@ -270,7 +270,7 @@ blackbox_relabel_configs:
     target_label: instance
     replacement: ${1}
 
-solr_exporter_version: 0.0.14
+solr_exporter_version: 0.1.0
 solr_exporter_release_system: linux-amd64
 solr_exporter_release_name: "prometheus-solr-exporter-{{ solr_exporter_version }}.{{ solr_exporter_release_system }}"
 solr_exporter_package: "{{ solr_exporter_release_name }}.tar.gz"
