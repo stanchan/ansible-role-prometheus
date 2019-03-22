@@ -10,7 +10,7 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.7.2
+prometheus_version: 2.8.0
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "{{ prometheus_release_name }}.tar.gz"
@@ -239,7 +239,7 @@ node_exporter_relabel_configs:
     target_label: instance
     replacement: ${1}
 
-blackbox_exporter_version: 0.13.0
+blackbox_exporter_version: 0.14.0
 blackbox_exporter_release_system: linux-amd64
 blackbox_exporter_release_name: "blackbox_exporter-{{ blackbox_exporter_version }}.{{ blackbox_exporter_release_system }}"
 blackbox_exporter_package: "{{ blackbox_exporter_release_name }}.tar.gz"
