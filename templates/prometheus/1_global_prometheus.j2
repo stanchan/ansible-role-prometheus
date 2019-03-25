@@ -27,8 +27,9 @@ alerting:
       - {{ am_host }}
 {% endfor %}
 
-rule_files:{% if prometheus_rules_templates %}
+rule_files:{% if prometheus_rules_templates is not defined and not prometheus_rules_templates %} []
+{% else %}
 {% for template in prometheus_rules_templates %}
   - {{ prometheus_rules_path }}/{{ template }}
 {% endfor %}
-{% else %} []{% endif %}
+{% endif %}
