@@ -16,4 +16,5 @@ galaxy_info:
     - trusty
   galaxy_tags:
     - prometheus
-dependencies:
+
+dependencies: []
