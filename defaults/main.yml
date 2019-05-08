@@ -308,14 +308,14 @@ solr_exporter_relabel_configs:
 
 solr_exporter_metric_relabel_configs:
   - source_labels: "['core']"
-    regex: "'^([\\w\\-]+)_shard([0-9_]+)_replica_(n\\d+)'"
+    regex: "'^([\\w\\-]+)_shard([0-9_]+)_replica_([npt].\\d+)'"
     replacement: "'${1}'"
     target_label: collection
   - source_labels: "['core']"
-    regex: "'^([\\w\\-]+)_shard([0-9_]+)_replica_(n\\d+)'"
+    regex: "'^([\\w\\-]+)_shard([0-9_]+)_replica_([npt].\\d+)'"
     replacement: "'${2}'"
     target_label: shard
   - source_labels: "['core']"
-    regex: "'^([\\w\\-]+)_shard([0-9_]+)_replica_(n\\d+)'"
+    regex: "'^([\\w\\-]+)_shard([0-9_]+)_replica_([npt].\\d+)'"
     replacement: "'${3}'"
     target_label: replica
