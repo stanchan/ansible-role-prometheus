@@ -10,7 +10,7 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.9.2
+prometheus_version: 2.10.0
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "{{ prometheus_release_name }}.tar.gz"
@@ -207,7 +207,7 @@ pushgateway_relabel_configs:
     target_label: instance
     replacement: ${1}
 
-node_exporter_version: 0.17.0
+node_exporter_version: 0.18.0
 node_exporter_release_system: linux-amd64
 node_exporter_release_name: "node_exporter-{{ node_exporter_version }}.{{ node_exporter_release_system }}"
 node_exporter_package: "{{ node_exporter_release_name }}.tar.gz"
