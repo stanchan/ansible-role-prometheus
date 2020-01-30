@@ -10,7 +10,7 @@ gosu_release_system: amd64
 gosu_url: "https://github.com/tianon/gosu/releases/download/{{ gosu_version }}/gosu-{{ gosu_release_system }}"
 gosu_ssl_verify: yes
 
-prometheus_version: 2.12.0
+prometheus_version: 2.15.2
 prometheus_release_system: linux-amd64
 prometheus_release_name: "prometheus-{{ prometheus_version }}.{{ prometheus_release_system }}"
 prometheus_package: "{{ prometheus_release_name }}.tar.gz"
@@ -113,7 +113,7 @@ prometheus_scrape:
       - env: 'devtest'
         nodes: "{{ groups['jmx_exporter'] | map('extract', hostvars, 'inventory_hostname') | map('regex_replace', '^(.*)$', '\\1:{}'.format(zookeeper_jmx_exporter_port)) | list }}"
 
-alertmanager_version: 0.19.0
+alertmanager_version: 0.20.0
 alertmanager_release_system: linux-amd64
 alertmanager_release_name: "alertmanager-{{ alertmanager_version }}.{{ alertmanager_release_system }}"
 alertmanager_package: "{{ alertmanager_release_name }}.tar.gz"
@@ -177,7 +177,7 @@ alertmanager_relabel_configs:
     target_label: instance
     replacement: ${1}
 
-pushgateway_version: 0.9.1
+pushgateway_version: 1.1.0
 pushgateway_release_system: linux-amd64
 pushgateway_release_name: "pushgateway-{{ pushgateway_version }}.{{ pushgateway_release_system }}"
 pushgateway_package: "{{ pushgateway_release_name }}.tar.gz"
@@ -199,6 +199,7 @@ pushgateway_releases_path: "{{ pushgateway_root_path }}/releases"
 pushgateway_log_file: "/var/log/pushgateway/pushgateway.log"
 
 pushgateway_service_options:
+  - "push.disable-consistency-check"
   - "web.listen-address=:{{ pushgateway_port }}"
   - "web.external-url=http://{{ pushgateway_external_hostname }}:{{ pushgateway_port }}/"
 
@@ -240,7 +241,7 @@ node_exporter_relabel_configs:
     target_label: instance
     replacement: ${1}
 
-blackbox_exporter_version: 0.15.1
+blackbox_exporter_version: 0.16.0
 blackbox_exporter_release_system: linux-amd64
 blackbox_exporter_release_name: "blackbox_exporter-{{ blackbox_exporter_version }}.{{ blackbox_exporter_release_system }}"
 blackbox_exporter_package: "{{ blackbox_exporter_release_name }}.tar.gz"
