@@ -27,6 +27,7 @@ prometheus_group: prometheus
 
 prometheus_root_path: /opt/prometheus
 prometheus_conf_path: /etc/prometheus
+prometheus_data_root: /data/prometheus
 prometheus_conf_file: "{{ prometheus_conf_path }}/prometheus.yml"
 prometheus_bin_path: "{{ prometheus_root_path }}/bin"
 prometheus_releases_path: "{{ prometheus_root_path }}/releases"
