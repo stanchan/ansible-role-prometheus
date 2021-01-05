@@ -31,8 +31,15 @@
       - "{{ prometheus_conf_path }}"
       - "{{ prometheus_rules_path }}"
       - "{{ prometheus_snippets_path }}"
-      - "{{ prometheus_data_path }}"
+      - "{{ prometheus_data_root }}"
       - "{{ prometheus_log_file | dirname }}"
+  - name: Link prometheus data
+    file:
+      src: "{{ prometheus_data_root }}"
+      dest: "{{ prometheus_data_path }}"
+      owner: "{{ prometheus_user }}"
+      group: "{{ prometheus_group }}"
+      state: link
   when: is_prometheus
 
 - block:
